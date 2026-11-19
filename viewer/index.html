@@ -1,0 +1,553 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body><title>GRM Virtual Showroom</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+/* Layout: slim control bar, a 3D/2D stage on the left, an info + station list rail on the right (stacked on phones). */
+:root{
+  --bg:#F2F5F9; --surface:#FFFFFF; --fg:#1A2030; --muted:#566074; --line:#D6DDE8;
+  --navy:#242A3B; --sky:#78C2F0; --orange:#F79428;
+  --btn-bg:#242A3B; --btn-fg:#FFFFFF; --btn-soft:#E6EDF6; --focus:#1D78B8;
+  --zone-a:#78C2F0; --zone-b:#F79428; --map-bg:#F8FAFD; --map-ink:#242A3B;
+  --font-head:'Space Grotesk','Segoe UI',system-ui,sans-serif; --font-body:'Inter','Segoe UI',system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12151F; --surface:#1B2030; --fg:#E7ECF4; --muted:#9AA6BA; --line:#2C3448;
+  --btn-bg:#78C2F0; --btn-fg:#16202E; --btn-soft:#262E42; --focus:#9BD4F6; --map-bg:#161B28; --map-ink:#E7ECF4; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12151F; --surface:#1B2030; --fg:#E7ECF4; --muted:#9AA6BA; --line:#2C3448;
+  --btn-bg:#78C2F0; --btn-fg:#16202E; --btn-soft:#262E42; --focus:#9BD4F6; --map-bg:#161B28; --map-ink:#E7ECF4; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px 28px}
+h1,h2,h3{font-family:var(--font-head);margin:0;text-wrap:balance}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;justify-content:space-between;max-width:1280px;margin:0 auto 12px}
+.brand h1{font-size:1.25rem;line-height:1.2}
+.brand p{margin:2px 0 0;color:var(--muted);font-size:.85rem}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:transparent;padding:8px 14px;min-height:40px}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--btn-bg);color:var(--btn-fg)}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 14px;min-height:40px}
+.btn.primary{background:var(--orange);border-color:var(--orange);color:#1B1B1B;font-weight:600}
+.btn.solid{background:var(--btn-bg);border-color:var(--btn-bg);color:var(--btn-fg)}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;max-width:1280px;margin:0 auto;align-items:start}
+@media (max-width:920px){.layout{grid-template-columns:minmax(0,1fr)}}
+.stage{position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface);min-width:0}
+#view3d{position:relative;height:clamp(360px,64vh,660px);outline-offset:-3px}
+#view3d canvas{display:block;width:100%;height:100%;touch-action:none}
+#tip{position:absolute;pointer-events:none;background:var(--navy);color:#fff;font-size:.8rem;padding:4px 8px;border-radius:6px;max-width:260px;display:none;z-index:3}
+.hint{position:absolute;left:10px;bottom:10px;right:10px;font-size:.78rem;color:#fff;background:rgba(36,42,59,.82);padding:6px 10px;border-radius:6px;pointer-events:none}
+.pad{position:absolute;right:10px;bottom:48px;display:none;grid-template-columns:repeat(3,44px);gap:4px;z-index:2}
+.pad.on{display:grid}
+.pad button{width:44px;height:44px;border-radius:8px;border:0;background:rgba(36,42,59,.82);color:#fff;font-size:1.1rem;touch-action:none}
+#map{padding:12px;background:var(--map-bg)}
+#map svg{display:block;width:100%;height:auto;max-height:70vh}
+#map .zone{stroke:var(--map-ink);stroke-opacity:.35;stroke-width:1}
+#map text{font-family:var(--font-body);fill:var(--map-ink)}
+#map .st{cursor:pointer}
+#map .st:focus-visible circle,#map .st:hover circle{stroke:var(--focus);stroke-width:3}
+.tour{display:none;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border-top:1px solid var(--line);background:var(--surface)}
+.tour.on{display:flex}
+.tour p{margin:0;flex:1 1 220px;min-width:0}
+.rail{display:flex;flex-direction:column;gap:14px;min-width:0}
+.card{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:14px;min-width:0}
+.card h2{font-size:1.05rem;margin-bottom:6px}
+.card h3{font-size:.9rem;margin:12px 0 4px}
+.card ul{margin:4px 0;padding-left:1.1rem}
+.card p{margin:6px 0}
+.muted{color:var(--muted);font-size:.85rem}
+.badge{display:inline-block;font-size:.72rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:99px;border:1px solid var(--line)}
+.badge.active{background:var(--orange);border-color:var(--orange);color:#1B1B1B}
+.badge.planned{color:var(--muted)}
+table{border-collapse:collapse;width:100%}
+td,th{text-align:left;padding:5px 6px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.list{display:grid;gap:6px}
+.list button{display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 10px;min-height:44px}
+.list button:hover{background:var(--btn-soft)}
+.list .nm{min-width:0}
+.list .nm b{display:block;font-weight:600}
+.list .nm span{color:var(--muted);font-size:.8rem}
+.scroll{max-height:340px;overflow:auto}
+.note{max-width:1280px;margin:14px auto 0;color:var(--muted);font-size:.8rem}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+
+<header class="bar">
+  <div class="brand">
+    <h1>GRM Network &amp; Data Solutions · Virtual HQ, Floor 3</h1>
+    <p id="tag">Connecting Homes. Empowering Lives.</p>
+  </div>
+  <div class="controls" role="toolbar" aria-label="View controls">
+    <div class="seg" role="group" aria-label="View mode">
+      <button id="bOverview" type="button" aria-pressed="false">Overview</button>
+      <button id="bWalk" type="button" aria-pressed="false">Walk</button>
+      <button id="bMap" type="button" aria-pressed="false">2D map</button>
+    </div>
+    <button id="bTour" class="btn" type="button">Guided tour</button>
+    <button id="bDay" class="btn" type="button" aria-pressed="false">Night lighting</button>
+    <button id="bLobby" class="btn primary" type="button">Return to Lobby</button>
+  </div>
+</header>
+
+<div class="layout">
+  <section class="stage" aria-label="Floor 3 showroom">
+    <div id="view3d" tabindex="0" role="application" aria-label="3D showroom. Use W A S D or arrow keys to move, drag to look. Every station is also listed on the right.">
+      <div id="tip"></div>
+      <div class="hint" id="hint"></div>
+      <div class="pad" id="pad" aria-hidden="true">
+        <span></span><button data-k="f" type="button">▲</button><span></span>
+        <button data-k="l" type="button">◀</button><button data-k="b" type="button">▼</button><button data-k="r" type="button">▶</button>
+      </div>
+    </div>
+    <div id="map" hidden></div>
+    <div class="tour" id="tour">
+      <p id="tourText"></p>
+      <button class="btn" id="tBack" type="button">Back</button>
+      <button class="btn solid" id="tNext" type="button">Next</button>
+      <button class="btn" id="tStop" type="button">Stop tour</button>
+    </div>
+  </section>
+
+  <aside class="rail">
+    <section class="card" id="panel" aria-live="polite" tabindex="-1"></section>
+    <section class="card">
+      <h2>AI employees</h2>
+      <p class="muted">13 stations. 5 are active; the rest are planned demonstrations.</p>
+      <div class="list scroll" id="botList"></div>
+    </section>
+    <section class="card">
+      <h2>Points of interest</h2>
+      <div class="list" id="poiList"></div>
+    </section>
+  </aside>
+</div>
+<p class="note" id="disclaimer"></p>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const SCENE = {"project": {"business_name": "GRM Network & Data Solutions", "niche": "Fiber-to-the-home (FTTH) Internet Service Provider (ISP)", "theme_name": "GRM AI-Powered Virtual ISP Headquarters & Showroom", "floor_label": "Floor 3"}, "assumptions": ["All geometry is a conceptual virtual envelope (20 m × 15 m × 3.2 m), not a building survey; no construction, fire-safety, load or accessibility-code compliance is claimed. Licensed professionals must verify any physical use.", "Fixed elements (columns, stairs, windows, elevators, fire exits) were not supplied and are not assumed; all shell walls are virtual and need verification.", "Coordinates: metres, origin at floor southwest corner, x east, z north, y up. Object position = bottom-centre of its bounding box (wall-mounted and hanging items included); scale = bounding-box size in metres; rotation = radians (y = 0 faces north).", "Zone bounds convert the template percentages to metres of the 20 × 15 m envelope; zone size is [width, ceiling height, depth].", "Entry is a virtual portal at the south wall centre (x = 10, z = 0). Exit location was not supplied; a conceptual return-to-lobby portal and always-visible HUD control are provided, flagged as not real egress. The building lobby link and adjacent-floor links are empty and pending.", "A 1.2 m centre aisle (x 9.4–10.6) is kept clear between the two demo wings; 13 bots are grouped by department across six zones to avoid crowding the route.", "Website and Facebook URLs were not supplied, so those signs are labeled link-pending info panels; no URLs were invented. The logo asset path is the placeholder {{GRM_LOGO_ASSET_URL}} and the official logo must be used unaltered.", "Internet plans (55/105/155/205/305 Mbps at PHP 999/1,299/1,499/1,999/2,499 per month) and support phone 0993 291 3471 come from a user-provided GRM promotional image; verify before public launch.", "Active bots at launch: GIA, ACE, FINN, TESS, OMAR (open_bot_chat:<id> keys must be implemented by the host app). The other 8 are planned/demo-only; their hotspots open an info panel and they are not claimed to modify live accounts or network settings.", "In-app action keys (play_demo:*, open_info_panel:*, open_bot_chat:*) are contract names for the host app to implement; none are claimed as already implemented.", "Public kiosks show general service information, public plans and sample non-personal data only. Billing, HR, subscriber data, NOC controls and analytics need authenticated authorized access; network changes, financial adjustments, disconnections and sensitive personnel decisions need human approval.", "Initial camera is placed south of the floor looking north so the entrance is in the foreground; the template's relative z of 1.35 (north side) was mirrored for that reason.", "Lighting values describe the day preset; a night preset should lower ambient/directional and raise spot and area intensity. Avatar GLB assets are placeholders (placeholder://) to be supplied.", "Possible future integrations (CRM, Google Sheets, Slack, n8n, ISP equipment management) are not asserted as connected."], "floor": {"width_m": 20, "depth_m": 15, "ceiling_height_m": 3.2, "entry_side": "south", "fixed_elements": ["Not provided – no columns, stairs, windows, elevators or fire exits assumed; verification required"]}, "zones": [{"id": "z_reception", "name": "Reception & Welcome", "center": [4.0, 1.6, 2.4], "size": [6.0, 3.2, 3.3], "purpose": "Welcome area with official logo wall, floor directory and the GRM GIA receptionist; starts the guided tour."}, {"id": "z_gallery", "name": "GRM Brand & FTTH Gallery", "center": [13.3, 1.6, 2.4], "size": [11.4, 3.2, 3.3], "purpose": "Brand tagline, public internet plans wall, FTTH explainer, ONT/router display, website and Facebook placeholders, plus GRM MAYA."}, {"id": "z_demo_left", "name": "AI Bot Demo Wing A", "center": [5.2, 1.6, 7.65], "size": [8.4, 3.2, 5.7], "purpose": "Sales, finance, collections, HR and documents/compliance stations (ACE, FINN, CLEO, HANA, LEX)."}, {"id": "z_demo_right", "name": "AI Bot Demo Wing B", "center": [14.8, 1.6, 7.65], "size": [8.4, 3.2, 5.7], "purpose": "Technical, network, field and inventory stations (TESS, NEO, MAX, IVY) and an interactive scenario wall."}, {"id": "z_consult", "name": "Consultation & Demo Meeting", "center": [5.2, 1.6, 12.825], "size": [8.4, 3.2, 2.85], "purpose": "Meeting table for consultations and demos; call-to-action to start an application with GRM ACE; support phone sign."}, {"id": "z_ops", "name": "AI Operations Dashboard", "center": [14.8, 1.6, 12.825], "size": [8.4, 3.2, 2.85], "purpose": "Operations dashboard wall (placeholder, sample data only), automation flow visual, GRM OMAR and GRM DEX."}], "bots": [{"id": "grm_gia", "name": "GRM GIA", "role": "AI Receptionist", "station_zone_id": "z_reception", "capabilities": ["Welcomes visitors", "Explains plans", "Directs inquiries", "Starts applications"], "demo_action_key": "open_bot_chat:grm_gia", "avatar_asset": "placeholder://avatars/grm_gia.glb", "status": "active"}, {"id": "grm_ace", "name": "GRM ACE", "role": "AI Sales Consultant", "station_zone_id": "z_demo_left", "capabilities": ["Qualifies leads", "Recommends packages", "Captures applications", "Prepares installation requests"], "demo_action_key": "open_bot_chat:grm_ace", "avatar_asset": "placeholder://avatars/grm_ace.glb", "status": "active"}, {"id": "grm_maya", "name": "GRM MAYA", "role": "AI Social Media Manager", "station_zone_id": "z_gallery", "capabilities": ["Drafts Facebook campaigns", "Drafts content calendars and announcements", "Prepares analytics reports", "Status: planned – demonstration only; not connected to live systems"], "demo_action_key": "play_demo:grm_maya_planned_preview", "avatar_asset": "placeholder://avatars/grm_maya.glb", "status": "planned"}, {"id": "grm_finn", "name": "GRM FINN", "role": "AI Finance Officer", "station_zone_id": "z_demo_left", "capabilities": ["Prepares statements of account (SOAs)", "Monitors receivables", "Reconciles verified payments", "Tracks expenses"], "demo_action_key": "open_bot_chat:grm_finn", "avatar_asset": "placeholder://avatars/grm_finn.glb", "status": "active"}, {"id": "grm_hana", "name": "GRM HANA", "role": "AI HR Officer", "station_zone_id": "z_demo_left", "capabilities": ["Drafts SOPs", "Supports recruitment", "Supports training and attendance", "Approved personnel administration", "Status: planned – demonstration only; not connected to live systems"], "demo_action_key": "play_demo:grm_hana_planned_preview", "avatar_asset": "placeholder://avatars/grm_hana.glb", "status": "planned"}, {"id": "grm_neo", "name": "GRM NEO", "role": "AI Network Engineer", "station_zone_id": "z_demo_right", "capabilities": ["Interprets OLT and ONT status", "Reads optical alarms", "Flags outages", "Suggests troubleshooting", "Status: planned – demonstration only; not connected to live systems"], "demo_action_key": "play_demo:grm_neo_planned_preview", "avatar_asset": "placeholder://avatars/grm_neo.glb", "status": "planned"}, {"id": "grm_tess", "name": "GRM TESS", "role": "AI Technical Support", "station_zone_id": "z_demo_right", "capabilities": ["Handles Red LOS reports", "Handles slow connection reports", "Creates tickets", "Escalates cases"], "demo_action_key": "open_bot_chat:grm_tess", "avatar_asset": "placeholder://avatars/grm_tess.glb", "status": "active"}, {"id": "grm_max", "name": "GRM MAX", "role": "AI Field Operations Coordinator", "station_zone_id": "z_demo_right", "capabilities": ["Prepares work orders", "Schedules installations and repairs", "Tracks field completion", "Status: planned – demonstration only; not connected to live systems"], "demo_action_key": "play_demo:grm_max_planned_preview", "avatar_asset": "placeholder://avatars/grm_max.glb", "status": "planned"}, {"id": "grm_cleo", "name": "GRM CLEO", "role": "AI Collection Officer", "station_zone_id": "z_demo_left", "capabilities": ["Tracks overdue accounts", "Prepares reminders", "Records payment promises", "Status: planned – demonstration only; not connected to live systems"], "demo_action_key": "play_demo:grm_cleo_planned_preview", "avatar_asset": "placeholder://avatars/grm_cleo.glb", "status": "planned"}, {"id": "grm_ivy", "name": "GRM IVY", "role": "AI Inventory & Procurement Officer", "station_zone_id": "z_demo_right", "capabilities": ["Tracks ONTs, routers and fiber cables", "Tracks tools and suppliers", "Tracks stock movements", "Status: planned – demonstration only; not connected to live systems"], "demo_action_key": "play_demo:grm_ivy_planned_preview", "avatar_asset": "placeholder://avatars/grm_ivy.glb", "status": "planned"}, {"id": "grm_lex", "name": "GRM LEX", "role": "AI Documents & Compliance Officer", "station_zone_id": "z_demo_left", "capabilities": ["Organizes service agreements", "Organizes subscriber documentation", "Organizes permits and compliance records", "Status: planned – demonstration only; not connected to live systems"], "demo_action_key": "play_demo:grm_lex_planned_preview", "avatar_asset": "placeholder://avatars/grm_lex.glb", "status": "planned"}, {"id": "grm_dex", "name": "GRM DEX", "role": "AI Business Intelligence Analyst", "station_zone_id": "z_ops", "capabilities": ["Analyzes subscribers and churn", "Analyzes revenues and operating costs", "Tracks department KPIs", "Status: planned – demonstration only; not connected to live systems"], "demo_action_key": "play_demo:grm_dex_planned_preview", "avatar_asset": "placeholder://avatars/grm_dex.glb", "status": "planned"}, {"id": "grm_omar", "name": "GRM OMAR", "role": "AI Operations Manager", "station_zone_id": "z_ops", "capabilities": ["Coordinates teams", "Reviews escalations", "Prepares management summaries for Slack"], "demo_action_key": "open_bot_chat:grm_omar", "avatar_asset": "placeholder://avatars/grm_omar.glb", "status": "active"}], "objects": [{"id": "floor_slab", "type": "floor", "position": [10, -0.1, 7.5], "rotation": [0, 0, 0], "scale": [20, 0.1, 15], "material_id": "m_floor", "label": "Conceptual floor slab"}, {"id": "wall_north", "type": "wall", "position": [10, 0, 14.95], "rotation": [0, 0, 0], "scale": [20, 3.2, 0.1], "material_id": "m_wall"}, {"id": "wall_south_west", "type": "wall", "position": [4.5, 0, 0.05], "rotation": [0, 0, 0], "scale": [9, 3.2, 0.1], "material_id": "m_wall"}, {"id": "wall_south_east", "type": "wall", "position": [15.5, 0, 0.05], "rotation": [0, 0, 0], "scale": [9, 3.2, 0.1], "material_id": "m_wall"}, {"id": "wall_west", "type": "wall", "position": [0.05, 0, 7.5], "rotation": [0, 0, 0], "scale": [0.1, 3.2, 15], "material_id": "m_wall"}, {"id": "wall_east", "type": "wall", "position": [19.95, 0, 7.5], "rotation": [0, 0, 0], "scale": [0.1, 3.2, 15], "material_id": "m_wall"}, {"id": "entry_portal", "type": "entry_portal", "position": [10, 0, 0.2], "rotation": [0, 0, 0], "scale": [2.0, 2.4, 0.2], "material_id": "m_sky", "label": "Virtual visitor entrance (south) – not a surveyed door"}, {"id": "return_portal_sign", "type": "hanging_sign", "position": [10, 2.6, 0.5], "rotation": [0, 0, 0], "scale": [1.6, 0.3, 0.05], "material_id": "m_navy", "label": "Return to Lobby / Exit (conceptual)"}, {"id": "logo_wall", "type": "logo_wall", "position": [0.2, 0, 2.4], "rotation": [0, 0, 0], "scale": [0.2, 2.8, 3.2], "material_id": "m_white", "asset_url": "{{GRM_LOGO_ASSET_URL}}", "zone_id": "z_reception", "label": "GRM Network & Data Solutions – official logo, unaltered"}, {"id": "reception_sofa", "type": "waiting_sofa", "position": [2.4, 0, 1.25], "rotation": [0, 0, 0], "scale": [1.8, 0.8, 0.8], "material_id": "m_sky", "zone_id": "z_reception", "label": "Visitor waiting sofa"}, {"id": "floor_directory", "type": "floor_directory", "position": [6.4, 0, 1.3], "rotation": [0, 0, 0], "scale": [0.8, 2.0, 0.3], "material_id": "m_navy", "zone_id": "z_reception", "label": "Floor 3 directory (floor selector links pending)"}, {"id": "tagline_banner", "type": "hanging_sign", "position": [10, 2.4, 4.4], "rotation": [0, 0, 0], "scale": [3.0, 0.6, 0.05], "material_id": "m_orange", "zone_id": "z_gallery", "label": "Connecting Homes. Empowering Lives."}, {"id": "website_preview_screen", "type": "wall_screen", "position": [12.2, 1.0, 0.2], "rotation": [0, 0, 0], "scale": [2.0, 1.2, 0.1], "material_id": "m_navy", "zone_id": "z_gallery", "label": "Website preview – URL pending"}, {"id": "facebook_page_sign", "type": "wall_sign", "position": [14.6, 1.0, 0.2], "rotation": [0, 0, 0], "scale": [1.4, 1.2, 0.1], "material_id": "m_sky", "zone_id": "z_gallery", "label": "Facebook page – URL pending"}, {"id": "ftth_explainer_display", "type": "display_stand", "position": [12.8, 0, 2.6], "rotation": [0, 0, 0], "scale": [2.4, 1.8, 0.3], "material_id": "m_navy", "zone_id": "z_gallery", "label": "FTTH path explainer: OLT → splitter → ONT → router"}, {"id": "ont_router_plinth", "type": "display_plinth", "position": [14.8, 0, 2.6], "rotation": [0, 0, 0], "scale": [1.0, 1.0, 0.8], "material_id": "m_white", "zone_id": "z_gallery", "label": "Sample ONT and router (generic models)"}, {"id": "plans_wall", "type": "plans_wall", "position": [19.8, 0, 2.4], "rotation": [0, 0, 0], "scale": [0.2, 2.4, 3.2], "material_id": "m_navy", "zone_id": "z_gallery", "label": "GRM internet plans – verify rates before public launch"}, {"id": "plan_card_55", "type": "plan_card", "position": [19.62, 1.2, 1.1], "rotation": [0, 0, 0], "scale": [0.1, 1.0, 0.55], "material_id": "m_orange", "zone_id": "z_gallery", "label": "55 Mbps – PHP 999/month"}, {"id": "plan_card_105", "type": "plan_card", "position": [19.62, 1.2, 1.75], "rotation": [0, 0, 0], "scale": [0.1, 1.0, 0.55], "material_id": "m_sky", "zone_id": "z_gallery", "label": "105 Mbps – PHP 1,299/month"}, {"id": "plan_card_155", "type": "plan_card", "position": [19.62, 1.2, 2.4], "rotation": [0, 0, 0], "scale": [0.1, 1.0, 0.55], "material_id": "m_sky", "zone_id": "z_gallery", "label": "155 Mbps – PHP 1,499/month"}, {"id": "plan_card_205", "type": "plan_card", "position": [19.62, 1.2, 3.05], "rotation": [0, 0, 0], "scale": [0.1, 1.0, 0.55], "material_id": "m_sky", "zone_id": "z_gallery", "label": "205 Mbps – PHP 1,999/month"}, {"id": "plan_card_305", "type": "plan_card", "position": [19.62, 1.2, 3.7], "rotation": [0, 0, 0], "scale": [0.1, 1.0, 0.55], "material_id": "m_sky", "zone_id": "z_gallery", "label": "305 Mbps – PHP 2,499/month"}, {"id": "wing_a_sign", "type": "hanging_sign", "position": [5.2, 2.5, 7.65], "rotation": [0, 0, 0], "scale": [2.4, 0.4, 0.05], "material_id": "m_navy", "zone_id": "z_demo_left", "label": "AI Bot Demo Wing A"}, {"id": "wing_b_sign", "type": "hanging_sign", "position": [14.8, 2.5, 7.65], "rotation": [0, 0, 0], "scale": [2.4, 0.4, 0.05], "material_id": "m_navy", "zone_id": "z_demo_right", "label": "AI Bot Demo Wing B"}, {"id": "wing_a_scenario_screen", "type": "wall_screen", "position": [0.25, 1.2, 7.65], "rotation": [0, 0, 0], "scale": [0.1, 1.4, 2.4], "material_id": "m_navy", "zone_id": "z_demo_left", "label": "Wing A scenario screen – sample, non-personal demos"}, {"id": "interactive_demo_wall", "type": "interactive_wall", "position": [19.8, 0, 7.65], "rotation": [0, 0, 0], "scale": [0.2, 2.6, 4.0], "material_id": "m_navy", "zone_id": "z_demo_right", "label": "Interactive scenario wall – sample troubleshooting, work-order and stock demos (not live)"}, {"id": "meeting_table", "type": "meeting_table", "position": [4.5, 0, 12.8], "rotation": [0, 0, 0], "scale": [3.0, 0.75, 1.2], "material_id": "m_white", "zone_id": "z_consult", "label": "Consultation & demo meeting table"}, {"id": "meeting_chair_1", "type": "chair", "position": [3.5, 0, 11.7], "rotation": [0, 0, 0], "scale": [0.45, 0.9, 0.45], "material_id": "m_navy", "zone_id": "z_consult"}, {"id": "meeting_chair_2", "type": "chair", "position": [4.5, 0, 11.7], "rotation": [0, 0, 0], "scale": [0.45, 0.9, 0.45], "material_id": "m_navy", "zone_id": "z_consult"}, {"id": "meeting_chair_3", "type": "chair", "position": [5.5, 0, 11.7], "rotation": [0, 0, 0], "scale": [0.45, 0.9, 0.45], "material_id": "m_navy", "zone_id": "z_consult"}, {"id": "meeting_chair_4", "type": "chair", "position": [3.5, 0, 13.9], "rotation": [0, 3.1416, 0], "scale": [0.45, 0.9, 0.45], "material_id": "m_navy", "zone_id": "z_consult"}, {"id": "meeting_chair_5", "type": "chair", "position": [4.5, 0, 13.9], "rotation": [0, 3.1416, 0], "scale": [0.45, 0.9, 0.45], "material_id": "m_navy", "zone_id": "z_consult"}, {"id": "meeting_chair_6", "type": "chair", "position": [5.5, 0, 13.9], "rotation": [0, 3.1416, 0], "scale": [0.45, 0.9, 0.45], "material_id": "m_navy", "zone_id": "z_consult"}, {"id": "consult_cta_screen", "type": "wall_screen", "position": [0.25, 1.2, 12.8], "rotation": [0, 0, 0], "scale": [0.1, 1.2, 2.4], "material_id": "m_orange", "zone_id": "z_consult", "label": "Book a consultation / start an application"}, {"id": "support_phone_sign", "type": "wall_sign", "position": [7.5, 1.8, 14.85], "rotation": [0, 0, 0], "scale": [1.6, 0.4, 0.05], "material_id": "m_sky", "zone_id": "z_consult", "label": "Customer support: 0993 291 3471"}, {"id": "ops_dashboard_wall", "type": "dashboard_wall", "position": [14.8, 1.0, 14.85], "rotation": [0, 0, 0], "scale": [6.0, 1.8, 0.1], "material_id": "m_navy", "zone_id": "z_ops", "label": "Operations dashboard – placeholder with sample data only; not live"}, {"id": "automation_flow_visual", "type": "display_stand", "position": [14.5, 0, 12.4], "rotation": [0, 0, 0], "scale": [1.6, 1.8, 0.2], "material_id": "m_navy", "zone_id": "z_ops", "label": "Automation flow visual (concept; integrations not asserted)"}, {"id": "grm_gia_desk", "type": "bot_desk", "position": [3.8, 0, 2.8], "rotation": [0, 3.1416, 0], "scale": [1.6, 0.75, 0.8], "material_id": "m_white", "zone_id": "z_reception", "label": "GRM GIA station"}, {"id": "grm_gia_pedestal", "type": "avatar_pedestal", "position": [3.8, 0, 3.6], "rotation": [0, 3.1416, 0], "scale": [0.6, 0.15, 0.6], "material_id": "m_sky", "zone_id": "z_reception"}, {"id": "grm_gia_avatar", "type": "avatar_humanoid", "position": [3.8, 0.15, 3.6], "rotation": [0, 3.1416, 0], "scale": [0.5, 1.75, 0.4], "material_id": "m_navy", "asset_url": "placeholder://avatars/grm_gia.glb", "zone_id": "z_reception", "label": "GRM GIA – AI Receptionist (navy uniform, orange accents)"}, {"id": "grm_gia_nameplate", "type": "nameplate", "position": [3.8, 0.75, 2.5], "rotation": [0, 3.1416, 0], "scale": [0.6, 0.1, 0.03], "material_id": "m_orange", "zone_id": "z_reception", "label": "GRM GIA · AI Receptionist"}, {"id": "grm_gia_dashboard", "type": "dashboard_screen", "position": [3.5, 0.75, 3.1], "rotation": [0, 3.1416, 0], "scale": [0.8, 0.5, 0.05], "material_id": "m_navy", "zone_id": "z_reception", "label": "GRM GIA dashboard – ACTIVE; sample non-personal data"}, {"id": "grm_gia_cue", "type": "cue_prop", "position": [4.35, 0.75, 2.8], "rotation": [0, 3.1416, 0], "scale": [0.3, 0.3, 0.3], "material_id": "m_sky", "zone_id": "z_reception", "label": "plan_brochure_stand"}, {"id": "grm_ace_desk", "type": "bot_desk", "position": [2.4, 0, 6.1], "rotation": [0, 0, 0], "scale": [1.6, 0.75, 0.8], "material_id": "m_white", "zone_id": "z_demo_left", "label": "GRM ACE station"}, {"id": "grm_ace_pedestal", "type": "avatar_pedestal", "position": [2.4, 0, 5.3], "rotation": [0, 0, 0], "scale": [0.6, 0.15, 0.6], "material_id": "m_sky", "zone_id": "z_demo_left"}, {"id": "grm_ace_avatar", "type": "avatar_humanoid", "position": [2.4, 0.15, 5.3], "rotation": [0, 0, 0], "scale": [0.5, 1.75, 0.4], "material_id": "m_navy", "asset_url": "placeholder://avatars/grm_ace.glb", "zone_id": "z_demo_left", "label": "GRM ACE – AI Sales Consultant (navy uniform, orange accents)"}, {"id": "grm_ace_nameplate", "type": "nameplate", "position": [2.4, 0.75, 6.4], "rotation": [0, 0, 0], "scale": [0.6, 0.1, 0.03], "material_id": "m_orange", "zone_id": "z_demo_left", "label": "GRM ACE · AI Sales Consultant"}, {"id": "grm_ace_dashboard", "type": "dashboard_screen", "position": [2.1, 0.75, 5.8], "rotation": [0, 0, 0], "scale": [0.8, 0.5, 0.05], "material_id": "m_navy", "zone_id": "z_demo_left", "label": "GRM ACE dashboard – ACTIVE; sample non-personal data"}, {"id": "grm_ace_cue", "type": "cue_prop", "position": [2.95, 0.75, 6.1], "rotation": [0, 0, 0], "scale": [0.3, 0.3, 0.3], "material_id": "m_sky", "zone_id": "z_demo_left", "label": "lead_pipeline_monitor"}, {"id": "grm_maya_desk", "type": "bot_desk", "position": [16.4, 0, 2.4], "rotation": [0, 3.1416, 0], "scale": [1.6, 0.75, 0.8], "material_id": "m_white", "zone_id": "z_gallery", "label": "GRM MAYA station"}, {"id": "grm_maya_pedestal", "type": "avatar_pedestal", "position": [16.4, 0, 3.2], "rotation": [0, 3.1416, 0], "scale": [0.6, 0.15, 0.6], "material_id": "m_sky", "zone_id": "z_gallery"}, {"id": "grm_maya_avatar", "type": "avatar_humanoid", "position": [16.4, 0.15, 3.2], "rotation": [0, 3.1416, 0], "scale": [0.5, 1.75, 0.4], "material_id": "m_navy", "asset_url": "placeholder://avatars/grm_maya.glb", "zone_id": "z_gallery", "label": "GRM MAYA – AI Social Media Manager (navy uniform, orange accents)"}, {"id": "grm_maya_nameplate", "type": "nameplate", "position": [16.4, 0.75, 2.1], "rotation": [0, 3.1416, 0], "scale": [0.6, 0.1, 0.03], "material_id": "m_orange", "zone_id": "z_gallery", "label": "GRM MAYA · AI Social Media Manager"}, {"id": "grm_maya_dashboard", "type": "dashboard_screen", "position": [16.1, 0.75, 2.7], "rotation": [0, 3.1416, 0], "scale": [0.8, 0.5, 0.05], "material_id": "m_navy", "zone_id": "z_gallery", "label": "GRM MAYA dashboard – PLANNED – demonstration only; sample non-personal data"}, {"id": "grm_maya_cue", "type": "cue_prop", "position": [16.95, 0.75, 2.4], "rotation": [0, 3.1416, 0], "scale": [0.3, 0.3, 0.3], "material_id": "m_sky", "zone_id": "z_gallery", "label": "content_calendar_board"}, {"id": "grm_finn_desk", "type": "bot_desk", "position": [5.2, 0, 6.1], "rotation": [0, 0, 0], "scale": [1.6, 0.75, 0.8], "material_id": "m_white", "zone_id": "z_demo_left", "label": "GRM FINN station"}, {"id": "grm_finn_pedestal", "type": "avatar_pedestal", "position": [5.2, 0, 5.3], "rotation": [0, 0, 0], "scale": [0.6, 0.15, 0.6], "material_id": "m_sky", "zone_id": "z_demo_left"}, {"id": "grm_finn_avatar", "type": "avatar_humanoid", "position": [5.2, 0.15, 5.3], "rotation": [0, 0, 0], "scale": [0.5, 1.75, 0.4], "material_id": "m_navy", "asset_url": "placeholder://avatars/grm_finn.glb", "zone_id": "z_demo_left", "label": "GRM FINN – AI Finance Officer (navy uniform, orange accents)"}, {"id": "grm_finn_nameplate", "type": "nameplate", "position": [5.2, 0.75, 6.4], "rotation": [0, 0, 0], "scale": [0.6, 0.1, 0.03], "material_id": "m_orange", "zone_id": "z_demo_left", "label": "GRM FINN · AI Finance Officer"}, {"id": "grm_finn_dashboard", "type": "dashboard_screen", "position": [4.9, 0.75, 5.8], "rotation": [0, 0, 0], "scale": [0.8, 0.5, 0.05], "material_id": "m_navy", "zone_id": "z_demo_left", "label": "GRM FINN dashboard – ACTIVE; sign-in required for live data"}, {"id": "grm_finn_cue", "type": "cue_prop", "position": [5.75, 0.75, 6.1], "rotation": [0, 0, 0], "scale": [0.3, 0.3, 0.3], "material_id": "m_sky", "zone_id": "z_demo_left", "label": "soa_document_tray"}, {"id": "grm_hana_desk", "type": "bot_desk", "position": [2.4, 0, 9.2], "rotation": [0, 3.1416, 0], "scale": [1.6, 0.75, 0.8], "material_id": "m_white", "zone_id": "z_demo_left", "label": "GRM HANA station"}, {"id": "grm_hana_pedestal", "type": "avatar_pedestal", "position": [2.4, 0, 10.0], "rotation": [0, 3.1416, 0], "scale": [0.6, 0.15, 0.6], "material_id": "m_sky", "zone_id": "z_demo_left"}, {"id": "grm_hana_avatar", "type": "avatar_humanoid", "position": [2.4, 0.15, 10.0], "rotation": [0, 3.1416, 0], "scale": [0.5, 1.75, 0.4], "material_id": "m_navy", "asset_url": "placeholder://avatars/grm_hana.glb", "zone_id": "z_demo_left", "label": "GRM HANA – AI HR Officer (navy uniform, orange accents)"}, {"id": "grm_hana_nameplate", "type": "nameplate", "position": [2.4, 0.75, 8.9], "rotation": [0, 3.1416, 0], "scale": [0.6, 0.1, 0.03], "material_id": "m_orange", "zone_id": "z_demo_left", "label": "GRM HANA · AI HR Officer"}, {"id": "grm_hana_dashboard", "type": "dashboard_screen", "position": [2.1, 0.75, 9.5], "rotation": [0, 3.1416, 0], "scale": [0.8, 0.5, 0.05], "material_id": "m_navy", "zone_id": "z_demo_left", "label": "GRM HANA dashboard – PLANNED – demonstration only; sign-in required for live data"}, {"id": "grm_hana_cue", "type": "cue_prop", "position": [2.95, 0.75, 9.2], "rotation": [0, 3.1416, 0], "scale": [0.3, 0.3, 0.3], "material_id": "m_sky", "zone_id": "z_demo_left", "label": "sop_binder"}, {"id": "grm_neo_desk", "type": "bot_desk", "position": [15.2, 0, 6.1], "rotation": [0, 0, 0], "scale": [1.6, 0.75, 0.8], "material_id": "m_white", "zone_id": "z_demo_right", "label": "GRM NEO station"}, {"id": "grm_neo_pedestal", "type": "avatar_pedestal", "position": [15.2, 0, 5.3], "rotation": [0, 0, 0], "scale": [0.6, 0.15, 0.6], "material_id": "m_sky", "zone_id": "z_demo_right"}, {"id": "grm_neo_avatar", "type": "avatar_humanoid", "position": [15.2, 0.15, 5.3], "rotation": [0, 0, 0], "scale": [0.5, 1.75, 0.4], "material_id": "m_navy", "asset_url": "placeholder://avatars/grm_neo.glb", "zone_id": "z_demo_right", "label": "GRM NEO – AI Network Engineer (navy uniform, orange accents)"}, {"id": "grm_neo_nameplate", "type": "nameplate", "position": [15.2, 0.75, 6.4], "rotation": [0, 0, 0], "scale": [0.6, 0.1, 0.03], "material_id": "m_orange", "zone_id": "z_demo_right", "label": "GRM NEO · AI Network Engineer"}, {"id": "grm_neo_dashboard", "type": "dashboard_screen", "position": [14.9, 0.75, 5.8], "rotation": [0, 0, 0], "scale": [0.8, 0.5, 0.05], "material_id": "m_navy", "zone_id": "z_demo_right", "label": "GRM NEO dashboard – PLANNED – demonstration only; sign-in required for live data"}, {"id": "grm_neo_cue", "type": "cue_prop", "position": [15.75, 0.75, 6.1], "rotation": [0, 0, 0], "scale": [0.3, 0.3, 0.3], "material_id": "m_sky", "zone_id": "z_demo_right", "label": "olt_rack_model"}, {"id": "grm_tess_desk", "type": "bot_desk", "position": [12.2, 0, 6.1], "rotation": [0, 0, 0], "scale": [1.6, 0.75, 0.8], "material_id": "m_white", "zone_id": "z_demo_right", "label": "GRM TESS station"}, {"id": "grm_tess_pedestal", "type": "avatar_pedestal", "position": [12.2, 0, 5.3], "rotation": [0, 0, 0], "scale": [0.6, 0.15, 0.6], "material_id": "m_sky", "zone_id": "z_demo_right"}, {"id": "grm_tess_avatar", "type": "avatar_humanoid", "position": [12.2, 0.15, 5.3], "rotation": [0, 0, 0], "scale": [0.5, 1.75, 0.4], "material_id": "m_navy", "asset_url": "placeholder://avatars/grm_tess.glb", "zone_id": "z_demo_right", "label": "GRM TESS – AI Technical Support (navy uniform, orange accents)"}, {"id": "grm_tess_nameplate", "type": "nameplate", "position": [12.2, 0.75, 6.4], "rotation": [0, 0, 0], "scale": [0.6, 0.1, 0.03], "material_id": "m_orange", "zone_id": "z_demo_right", "label": "GRM TESS · AI Technical Support"}, {"id": "grm_tess_dashboard", "type": "dashboard_screen", "position": [11.9, 0.75, 5.8], "rotation": [0, 0, 0], "scale": [0.8, 0.5, 0.05], "material_id": "m_navy", "zone_id": "z_demo_right", "label": "GRM TESS dashboard – ACTIVE; sample non-personal data"}, {"id": "grm_tess_cue", "type": "cue_prop", "position": [12.75, 0.75, 6.1], "rotation": [0, 0, 0], "scale": [0.3, 0.3, 0.3], "material_id": "m_sky", "zone_id": "z_demo_right", "label": "ont_los_demo_unit"}, {"id": "grm_max_desk", "type": "bot_desk", "position": [12.2, 0, 9.2], "rotation": [0, 3.1416, 0], "scale": [1.6, 0.75, 0.8], "material_id": "m_white", "zone_id": "z_demo_right", "label": "GRM MAX station"}, {"id": "grm_max_pedestal", "type": "avatar_pedestal", "position": [12.2, 0, 10.0], "rotation": [0, 3.1416, 0], "scale": [0.6, 0.15, 0.6], "material_id": "m_sky", "zone_id": "z_demo_right"}, {"id": "grm_max_avatar", "type": "avatar_humanoid", "position": [12.2, 0.15, 10.0], "rotation": [0, 3.1416, 0], "scale": [0.5, 1.75, 0.4], "material_id": "m_navy", "asset_url": "placeholder://avatars/grm_max.glb", "zone_id": "z_demo_right", "label": "GRM MAX – AI Field Operations Coordinator (navy uniform, orange accents)"}, {"id": "grm_max_nameplate", "type": "nameplate", "position": [12.2, 0.75, 8.9], "rotation": [0, 3.1416, 0], "scale": [0.6, 0.1, 0.03], "material_id": "m_orange", "zone_id": "z_demo_right", "label": "GRM MAX · AI Field Operations Coordinator"}, {"id": "grm_max_dashboard", "type": "dashboard_screen", "position": [11.9, 0.75, 9.5], "rotation": [0, 3.1416, 0], "scale": [0.8, 0.5, 0.05], "material_id": "m_navy", "zone_id": "z_demo_right", "label": "GRM MAX dashboard – PLANNED – demonstration only; sample non-personal data"}, {"id": "grm_max_cue", "type": "cue_prop", "position": [12.75, 0.75, 9.2], "rotation": [0, 3.1416, 0], "scale": [0.3, 0.3, 0.3], "material_id": "m_sky", "zone_id": "z_demo_right", "label": "work_order_board"}, {"id": "grm_cleo_desk", "type": "bot_desk", "position": [8.0, 0, 6.1], "rotation": [0, 0, 0], "scale": [1.6, 0.75, 0.8], "material_id": "m_white", "zone_id": "z_demo_left", "label": "GRM CLEO station"}, {"id": "grm_cleo_pedestal", "type": "avatar_pedestal", "position": [8.0, 0, 5.3], "rotation": [0, 0, 0], "scale": [0.6, 0.15, 0.6], "material_id": "m_sky", "zone_id": "z_demo_left"}, {"id": "grm_cleo_avatar", "type": "avatar_humanoid", "position": [8.0, 0.15, 5.3], "rotation": [0, 0, 0], "scale": [0.5, 1.75, 0.4], "material_id": "m_navy", "asset_url": "placeholder://avatars/grm_cleo.glb", "zone_id": "z_demo_left", "label": "GRM CLEO – AI Collection Officer (navy uniform, orange accents)"}, {"id": "grm_cleo_nameplate", "type": "nameplate", "position": [8.0, 0.75, 6.4], "rotation": [0, 0, 0], "scale": [0.6, 0.1, 0.03], "material_id": "m_orange", "zone_id": "z_demo_left", "label": "GRM CLEO · AI Collection Officer"}, {"id": "grm_cleo_dashboard", "type": "dashboard_screen", "position": [7.7, 0.75, 5.8], "rotation": [0, 0, 0], "scale": [0.8, 0.5, 0.05], "material_id": "m_navy", "zone_id": "z_demo_left", "label": "GRM CLEO dashboard – PLANNED – demonstration only; sign-in required for live data"}, {"id": "grm_cleo_cue", "type": "cue_prop", "position": [8.55, 0.75, 6.1], "rotation": [0, 0, 0], "scale": [0.3, 0.3, 0.3], "material_id": "m_sky", "zone_id": "z_demo_left", "label": "overdue_tracker_tablet"}, {"id": "grm_ivy_desk", "type": "bot_desk", "position": [15.2, 0, 9.2], "rotation": [0, 3.1416, 0], "scale": [1.6, 0.75, 0.8], "material_id": "m_white", "zone_id": "z_demo_right", "label": "GRM IVY station"}, {"id": "grm_ivy_pedestal", "type": "avatar_pedestal", "position": [15.2, 0, 10.0], "rotation": [0, 3.1416, 0], "scale": [0.6, 0.15, 0.6], "material_id": "m_sky", "zone_id": "z_demo_right"}, {"id": "grm_ivy_avatar", "type": "avatar_humanoid", "position": [15.2, 0.15, 10.0], "rotation": [0, 3.1416, 0], "scale": [0.5, 1.75, 0.4], "material_id": "m_navy", "asset_url": "placeholder://avatars/grm_ivy.glb", "zone_id": "z_demo_right", "label": "GRM IVY – AI Inventory & Procurement Officer (navy uniform, orange accents)"}, {"id": "grm_ivy_nameplate", "type": "nameplate", "position": [15.2, 0.75, 8.9], "rotation": [0, 3.1416, 0], "scale": [0.6, 0.1, 0.03], "material_id": "m_orange", "zone_id": "z_demo_right", "label": "GRM IVY · AI Inventory & Procurement Officer"}, {"id": "grm_ivy_dashboard", "type": "dashboard_screen", "position": [14.9, 0.75, 9.5], "rotation": [0, 3.1416, 0], "scale": [0.8, 0.5, 0.05], "material_id": "m_navy", "zone_id": "z_demo_right", "label": "GRM IVY dashboard – PLANNED – demonstration only; sample non-personal data"}, {"id": "grm_ivy_cue", "type": "cue_prop", "position": [15.75, 0.75, 9.2], "rotation": [0, 3.1416, 0], "scale": [0.3, 0.3, 0.3], "material_id": "m_sky", "zone_id": "z_demo_right", "label": "ont_router_stock_shelf"}, {"id": "grm_lex_desk", "type": "bot_desk", "position": [5.2, 0, 9.2], "rotation": [0, 3.1416, 0], "scale": [1.6, 0.75, 0.8], "material_id": "m_white", "zone_id": "z_demo_left", "label": "GRM LEX station"}, {"id": "grm_lex_pedestal", "type": "avatar_pedestal", "position": [5.2, 0, 10.0], "rotation": [0, 3.1416, 0], "scale": [0.6, 0.15, 0.6], "material_id": "m_sky", "zone_id": "z_demo_left"}, {"id": "grm_lex_avatar", "type": "avatar_humanoid", "position": [5.2, 0.15, 10.0], "rotation": [0, 3.1416, 0], "scale": [0.5, 1.75, 0.4], "material_id": "m_navy", "asset_url": "placeholder://avatars/grm_lex.glb", "zone_id": "z_demo_left", "label": "GRM LEX – AI Documents & Compliance Officer (navy uniform, orange accents)"}, {"id": "grm_lex_nameplate", "type": "nameplate", "position": [5.2, 0.75, 8.9], "rotation": [0, 3.1416, 0], "scale": [0.6, 0.1, 0.03], "material_id": "m_orange", "zone_id": "z_demo_left", "label": "GRM LEX · AI Documents & Compliance Officer"}, {"id": "grm_lex_dashboard", "type": "dashboard_screen", "position": [4.9, 0.75, 9.5], "rotation": [0, 3.1416, 0], "scale": [0.8, 0.5, 0.05], "material_id": "m_navy", "zone_id": "z_demo_left", "label": "GRM LEX dashboard – PLANNED – demonstration only; sign-in required for live data"}, {"id": "grm_lex_cue", "type": "cue_prop", "position": [5.75, 0.75, 9.2], "rotation": [0, 3.1416, 0], "scale": [0.3, 0.3, 0.3], "material_id": "m_sky", "zone_id": "z_demo_left", "label": "document_cabinet_model"}, {"id": "grm_dex_desk", "type": "bot_desk", "position": [16.8, 0, 12.4], "rotation": [0, 3.1416, 0], "scale": [1.6, 0.75, 0.8], "material_id": "m_white", "zone_id": "z_ops", "label": "GRM DEX station"}, {"id": "grm_dex_pedestal", "type": "avatar_pedestal", "position": [16.8, 0, 13.2], "rotation": [0, 3.1416, 0], "scale": [0.6, 0.15, 0.6], "material_id": "m_sky", "zone_id": "z_ops"}, {"id": "grm_dex_avatar", "type": "avatar_humanoid", "position": [16.8, 0.15, 13.2], "rotation": [0, 3.1416, 0], "scale": [0.5, 1.75, 0.4], "material_id": "m_navy", "asset_url": "placeholder://avatars/grm_dex.glb", "zone_id": "z_ops", "label": "GRM DEX – AI Business Intelligence Analyst (navy uniform, orange accents)"}, {"id": "grm_dex_nameplate", "type": "nameplate", "position": [16.8, 0.75, 12.1], "rotation": [0, 3.1416, 0], "scale": [0.6, 0.1, 0.03], "material_id": "m_orange", "zone_id": "z_ops", "label": "GRM DEX · AI Business Intelligence Analyst"}, {"id": "grm_dex_dashboard", "type": "dashboard_screen", "position": [16.5, 0.75, 12.7], "rotation": [0, 3.1416, 0], "scale": [0.8, 0.5, 0.05], "material_id": "m_navy", "zone_id": "z_ops", "label": "GRM DEX dashboard – PLANNED – demonstration only; sign-in required for live data"}, {"id": "grm_dex_cue", "type": "cue_prop", "position": [17.35, 0.75, 12.4], "rotation": [0, 3.1416, 0], "scale": [0.3, 0.3, 0.3], "material_id": "m_sky", "zone_id": "z_ops", "label": "kpi_chart_tablet"}, {"id": "grm_omar_desk", "type": "bot_desk", "position": [12.2, 0, 12.4], "rotation": [0, 3.1416, 0], "scale": [1.6, 0.75, 0.8], "material_id": "m_white", "zone_id": "z_ops", "label": "GRM OMAR station"}, {"id": "grm_omar_pedestal", "type": "avatar_pedestal", "position": [12.2, 0, 13.2], "rotation": [0, 3.1416, 0], "scale": [0.6, 0.15, 0.6], "material_id": "m_sky", "zone_id": "z_ops"}, {"id": "grm_omar_avatar", "type": "avatar_humanoid", "position": [12.2, 0.15, 13.2], "rotation": [0, 3.1416, 0], "scale": [0.5, 1.75, 0.4], "material_id": "m_navy", "asset_url": "placeholder://avatars/grm_omar.glb", "zone_id": "z_ops", "label": "GRM OMAR – AI Operations Manager (navy uniform, orange accents)"}, {"id": "grm_omar_nameplate", "type": "nameplate", "position": [12.2, 0.75, 12.1], "rotation": [0, 3.1416, 0], "scale": [0.6, 0.1, 0.03], "material_id": "m_orange", "zone_id": "z_ops", "label": "GRM OMAR · AI Operations Manager"}, {"id": "grm_omar_dashboard", "type": "dashboard_screen", "position": [11.9, 0.75, 12.7], "rotation": [0, 3.1416, 0], "scale": [0.8, 0.5, 0.05], "material_id": "m_navy", "zone_id": "z_ops", "label": "GRM OMAR dashboard – ACTIVE; sign-in required for live data"}, {"id": "grm_omar_cue", "type": "cue_prop", "position": [12.75, 0.75, 12.4], "rotation": [0, 3.1416, 0], "scale": [0.3, 0.3, 0.3], "material_id": "m_sky", "zone_id": "z_ops", "label": "escalation_queue_tablet"}], "materials": [{"id": "m_navy", "base_color": "#242A3B", "roughness": 0.5, "metalness": 0.1}, {"id": "m_sky", "base_color": "#78C2F0", "roughness": 0.4, "metalness": 0.0}, {"id": "m_orange", "base_color": "#F79428", "roughness": 0.45, "metalness": 0.0}, {"id": "m_white", "base_color": "#FFFFFF", "roughness": 0.6, "metalness": 0.0}, {"id": "m_wall", "base_color": "#F4F6F9", "roughness": 0.8, "metalness": 0.0}, {"id": "m_floor", "base_color": "#DDE3EA", "roughness": 0.35, "metalness": 0.05}], "lighting": [{"type": "ambient", "position": [10, 3, 7.5], "intensity": 0.5, "color": "#FFFFFF"}, {"type": "directional", "position": [10, 3.0, 7.5], "intensity": 0.6, "color": "#FFF4E5"}, {"type": "area", "position": [4.0, 3.1, 2.4], "intensity": 0.8, "color": "#EAF4FF"}, {"type": "area", "position": [13.3, 3.1, 2.4], "intensity": 0.8, "color": "#EAF4FF"}, {"type": "area", "position": [5.2, 3.1, 7.65], "intensity": 0.8, "color": "#EAF4FF"}, {"type": "area", "position": [14.8, 3.1, 7.65], "intensity": 0.8, "color": "#EAF4FF"}, {"type": "area", "position": [5.2, 3.1, 12.82], "intensity": 0.8, "color": "#EAF4FF"}, {"type": "area", "position": [14.8, 3.1, 12.82], "intensity": 0.8, "color": "#EAF4FF"}, {"type": "spot", "position": [1.5, 2.9, 2.4], "intensity": 1.0, "color": "#FFE2BF"}, {"type": "spot", "position": [10, 2.9, 3.6], "intensity": 0.8, "color": "#FFE2BF"}, {"type": "spot", "position": [14.8, 2.9, 13.8], "intensity": 0.7, "color": "#FFE2BF"}], "cameras": [{"id": "cam_overview", "position": [10, 15, -9], "target": [10, 0, 7.5], "fov": 45}, {"id": "cam_entry", "position": [10, 1.6, 0.6], "target": [10, 1.6, 8], "fov": 65}, {"id": "cam_reception", "position": [6.5, 1.6, 0.9], "target": [3.8, 1.4, 3.2], "fov": 60}, {"id": "cam_gallery", "position": [10.8, 1.6, 1.0], "target": [15.5, 1.4, 2.8], "fov": 60}, {"id": "cam_wing_a", "position": [9.0, 1.6, 7.65], "target": [3.8, 1.2, 7.65], "fov": 65}, {"id": "cam_wing_b", "position": [10.9, 1.6, 7.65], "target": [16.5, 1.2, 7.65], "fov": 65}, {"id": "cam_ops", "position": [10.8, 1.6, 11.7], "target": [15.5, 1.4, 13.8], "fov": 60}, {"id": "cam_consult", "position": [9.0, 1.6, 11.7], "target": [4.5, 1.0, 13.0], "fov": 60}], "hotspots": [{"id": "hs_grm_gia", "label": "Talk to GRM GIA", "position": [3.8, 2.1, 3.5999999999999996], "action_type": "open_bot_chat", "action_target": "open_bot_chat:grm_gia", "bot_id": "grm_gia"}, {"id": "hs_grm_ace", "label": "Talk to GRM ACE", "position": [2.4, 2.1, 5.3], "action_type": "open_bot_chat", "action_target": "open_bot_chat:grm_ace", "bot_id": "grm_ace"}, {"id": "hs_grm_maya", "label": "GRM MAYA – planned (demonstration preview, not connected)", "position": [16.4, 2.1, 3.2], "action_type": "open_info_panel", "action_target": "open_info_panel:grm_maya_planned_preview", "bot_id": "grm_maya"}, {"id": "hs_grm_finn", "label": "Talk to GRM FINN", "position": [5.2, 2.1, 5.3], "action_type": "open_bot_chat", "action_target": "open_bot_chat:grm_finn", "bot_id": "grm_finn"}, {"id": "hs_grm_hana", "label": "GRM HANA – planned (demonstration preview, not connected)", "position": [2.4, 2.1, 10.0], "action_type": "open_info_panel", "action_target": "open_info_panel:grm_hana_planned_preview", "bot_id": "grm_hana"}, {"id": "hs_grm_neo", "label": "GRM NEO – planned (demonstration preview, not connected)", "position": [15.2, 2.1, 5.3], "action_type": "open_info_panel", "action_target": "open_info_panel:grm_neo_planned_preview", "bot_id": "grm_neo"}, {"id": "hs_grm_tess", "label": "Talk to GRM TESS", "position": [12.2, 2.1, 5.3], "action_type": "open_bot_chat", "action_target": "open_bot_chat:grm_tess", "bot_id": "grm_tess"}, {"id": "hs_grm_max", "label": "GRM MAX – planned (demonstration preview, not connected)", "position": [12.2, 2.1, 10.0], "action_type": "open_info_panel", "action_target": "open_info_panel:grm_max_planned_preview", "bot_id": "grm_max"}, {"id": "hs_grm_cleo", "label": "GRM CLEO – planned (demonstration preview, not connected)", "position": [8.0, 2.1, 5.3], "action_type": "open_info_panel", "action_target": "open_info_panel:grm_cleo_planned_preview", "bot_id": "grm_cleo"}, {"id": "hs_grm_ivy", "label": "GRM IVY – planned (demonstration preview, not connected)", "position": [15.2, 2.1, 10.0], "action_type": "open_info_panel", "action_target": "open_info_panel:grm_ivy_planned_preview", "bot_id": "grm_ivy"}, {"id": "hs_grm_lex", "label": "GRM LEX – planned (demonstration preview, not connected)", "position": [5.2, 2.1, 10.0], "action_type": "open_info_panel", "action_target": "open_info_panel:grm_lex_planned_preview", "bot_id": "grm_lex"}, {"id": "hs_grm_dex", "label": "GRM DEX – planned (demonstration preview, not connected)", "position": [16.8, 2.1, 13.200000000000001], "action_type": "open_info_panel", "action_target": "open_info_panel:grm_dex_planned_preview", "bot_id": "grm_dex"}, {"id": "hs_grm_omar", "label": "Talk to GRM OMAR", "position": [12.2, 2.1, 13.200000000000001], "action_type": "open_bot_chat", "action_target": "open_bot_chat:grm_omar", "bot_id": "grm_omar"}, {"id": "hs_return_lobby", "label": "Return to Lobby / Entrance", "position": [10, 2.1, 0.5], "action_type": "navigate_zone", "action_target": "z_reception"}, {"id": "hs_floor_directory", "label": "Floor 3 directory", "position": [6.4, 1.6, 1.3], "action_type": "open_info_panel", "action_target": "open_info_panel:floor_directory"}, {"id": "hs_guided_tour", "label": "Start guided tour", "position": [5.4, 1.2, 2.8], "action_type": "play_demo", "action_target": "play_demo:guided_tour"}, {"id": "hs_website", "label": "Website (link pending)", "position": [12.2, 1.0, 0.5], "action_type": "open_info_panel", "action_target": "open_info_panel:website_link_pending"}, {"id": "hs_facebook", "label": "Facebook page (link pending)", "position": [14.6, 1.0, 0.5], "action_type": "open_info_panel", "action_target": "open_info_panel:facebook_link_pending"}, {"id": "hs_ftth_explainer", "label": "How FTTH works", "position": [12.8, 1.9, 2.6], "action_type": "play_demo", "action_target": "play_demo:ftth_explainer"}, {"id": "hs_plans", "label": "Internet plans", "position": [19.4, 1.9, 2.4], "action_type": "open_info_panel", "action_target": "open_info_panel:internet_plans"}, {"id": "hs_book_consultation", "label": "Book a consultation / start application with GRM ACE", "position": [0.6, 1.9, 12.8], "action_type": "open_bot_chat", "action_target": "open_bot_chat:grm_ace", "bot_id": "grm_ace"}, {"id": "hs_support_phone", "label": "Customer support: 0993 291 3471", "position": [7.5, 1.8, 14.6], "action_type": "open_info_panel", "action_target": "open_info_panel:support_phone"}, {"id": "hs_ops_dashboard", "label": "Operations dashboard (sample data)", "position": [14.8, 1.6, 14.6], "action_type": "open_info_panel", "action_target": "open_info_panel:operations_dashboard_placeholder"}, {"id": "hs_scenario_wall", "label": "Interactive scenario wall (demo only)", "position": [19.4, 1.6, 7.65], "action_type": "play_demo", "action_target": "play_demo:scenario_wall_samples"}], "visitor_route": ["entry_portal", "z_reception", "z_gallery", "z_demo_left", "z_demo_right", "z_ops", "z_consult", "return_portal_sign"], "responsive": {"desktop": "Free-roam 3D with WASD/arrow keys and mouse look, click or Enter on hotspots, guided-tour button, day/night toggle, floor selector and an always-visible Return to Lobby control; initial view cam_overview.", "mobile": "2D clickable floor map with bot cards (active/planned badges), direct Talk-to-bot actions, plans and support-phone panels; no mandatory free-roam movement; optional tap-to-teleport between camera viewpoints.", "reduced_motion": "Honor prefers-reduced-motion: disable idle avatar animation, camera fly-throughs and pulsing highlights; jump between viewpoints instantly; every hotspot reachable by keyboard tab order with visible focus and text labels."}};
+(function(){
+'use strict';
+const S = SCENE;
+const $ = s => document.querySelector(s);
+const esc = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let reduce = false; try{ reduce = matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){}
+const W = S.floor.width_m, D = S.floor.depth_m;
+const botsById = Object.fromEntries(S.bots.map(b => [b.id, b]));
+const zonesById = Object.fromEntries(S.zones.map(z => [z.id, z]));
+const objById = Object.fromEntries(S.objects.map(o => [o.id, o]));
+const camById = Object.fromEntries(S.cameras.map(c => [c.id, c]));
+const hsById = Object.fromEntries(S.hotspots.map(h => [h.id, h]));
+const matColor = Object.fromEntries(S.materials.map(m => [m.id, m.base_color]));
+const ZONE_CAM = {z_reception:'cam_reception', z_gallery:'cam_gallery', z_demo_left:'cam_wing_a', z_demo_right:'cam_wing_b', z_ops:'cam_ops', z_consult:'cam_consult'};
+const ROUTE_CAM = Object.assign({entry_portal:'cam_entry', return_portal_sign:'cam_entry'}, ZONE_CAM);
+const HS_CAM = {hs_plans:'cam_gallery', hs_website:'cam_gallery', hs_facebook:'cam_gallery', hs_ftth_explainer:'cam_gallery',
+  hs_support_phone:'cam_consult', hs_book_consultation:'cam_consult', hs_ops_dashboard:'cam_ops', hs_scenario_wall:'cam_wing_b',
+  hs_floor_directory:'cam_reception', hs_return_lobby:'cam_entry'};
+const POI = ['hs_plans','hs_ftth_explainer','hs_floor_directory','hs_website','hs_facebook','hs_support_phone','hs_book_consultation','hs_scenario_wall','hs_ops_dashboard'];
+
+/* ---------- WebGL availability ---------- */
+let hasGL = false;
+try{ const c = document.createElement('canvas'); hasGL = !!(window.THREE && (c.getContext('webgl') || c.getContext('experimental-webgl'))); }catch(e){}
+
+/* ---------- 3D scene ---------- */
+const view = $('#view3d');
+let renderer, scene, camera, pickables = [], solids = [], lights = [], markers = [], night = false;
+const V = (x,y,z) => new THREE.Vector3(x, y, -z);        // scene JSON (x east, z north) -> three.js (z flipped)
+const state = { mode:'overview', orbit:{target:V(10,0,7.5), r:20, az:0, el:.7}, walk:{pos:V(10,1.6,.6), yaw:0, pitch:0} };
+const look = new THREE.Vector3();
+let tween = null, keys = {}, rendering = false, last = 0;
+
+function lum(hex){ const n = parseInt(hex.slice(1),16); return (0.299*(n>>16) + 0.587*((n>>8)&255) + 0.114*(n&255))/255; }
+function wrapText(g, text, maxW){
+  const out = [];
+  String(text).split('\n').forEach(par => {
+    let line = '';
+    par.split(' ').forEach(w => { const t = line ? line + ' ' + w : w; if(g.measureText(t).width > maxW && line){ out.push(line); line = w; } else line = t; });
+    out.push(line);
+  });
+  return out;
+}
+function labelTexture(text, aspect, bg, fg){
+  const cw = 512, ch = Math.max(64, Math.min(1024, Math.round(cw/aspect)));
+  const c = document.createElement('canvas'); c.width = cw; c.height = ch; const g = c.getContext('2d');
+  g.fillStyle = bg; g.fillRect(0,0,cw,ch);
+  const pad = Math.round(ch*.07) + 8, maxW = cw - pad*2, maxH = ch - pad*2;
+  let size = Math.min(maxH, 84), lines = [];
+  for(; size >= 10; size -= 2){
+    g.font = '600 ' + size + 'px Inter, Arial, sans-serif'; lines = wrapText(g, text, maxW);
+    if(lines.length*size*1.18 <= maxH && lines.every(l => g.measureText(l).width <= maxW)) break;
+  }
+  g.fillStyle = fg; g.textAlign = 'center'; g.textBaseline = 'middle';
+  const lh = size*1.18, y0 = ch/2 - (lines.length-1)*lh/2;
+  lines.forEach((l,i) => g.fillText(l, cw/2, y0 + i*lh));
+  const t = new THREE.CanvasTexture(c); t.anisotropy = 4; return t;
+}
+const WALL_TYPES = ['wall_screen','wall_sign','plan_card','dashboard_wall','logo_wall','interactive_wall','plans_wall'];
+const DOUBLE = ['hanging_sign','display_stand','floor_directory'];
+const TEXTED = WALL_TYPES.concat(DOUBLE, ['nameplate','dashboard_screen','entry_portal']);
+function facing(o){
+  const x = o.position[0], z = o.position[2];
+  if(WALL_TYPES.includes(o.type)){ if(x < 1) return [1,0]; if(x > W-1) return [-1,0]; if(z < 1) return [0,1]; if(z > D-1) return [0,-1]; }
+  const ry = o.rotation[1]; return [Math.sin(ry), Math.cos(ry)];
+}
+function stdMat(id){ const m = S.materials.find(m => m.id === id) || {base_color:'#CCCCCC'};
+  return new THREE.MeshStandardMaterial({color:m.base_color, roughness:m.roughness ?? .6, metalness:m.metalness ?? 0}); }
+function labelFor(o){
+  if(o.type === 'entry_portal') return 'ENTRANCE';
+  if(o.type === 'dashboard_screen'){ const id = o.id.replace('_dashboard',''); const b = botsById[id]; if(b) return b.name + '\n' + (b.status === 'active' ? 'ACTIVE' : 'PLANNED'); }
+  return o.label;
+}
+function addText(group, o, w, h, d){
+  const txt = labelFor(o); if(!txt) return;
+  const [dx,dz] = facing(o);
+  const horizW = Math.abs(dz) > Math.abs(dx) ? o.scale[0] : o.scale[2];
+  const depth = Math.abs(dz) > Math.abs(dx) ? o.scale[2] : o.scale[0];
+  const ph = o.scale[1]*.92, pw = horizW*.94;
+  const bgc = matColor[o.material_id] || '#242A3B', fgc = lum(bgc) > .55 ? '#242A3B' : '#FFFFFF';
+  const sides = DOUBLE.includes(o.type) ? [1,-1] : [1];
+  sides.forEach(sg => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(pw, ph), new THREE.MeshBasicMaterial({map:labelTexture(txt, pw/ph, bgc, fgc), toneMapped:false}));
+    const off = depth/2 + .006;
+    m.position.set(o.position[0] + dx*sg*off, o.position[1] + o.scale[1]/2, -(o.position[2] + dz*sg*off));
+    m.rotation.y = Math.atan2(dx*sg, -dz*sg);
+    scene.add(m);
+  });
+}
+function makeAvatar(o, i){
+  const g = new THREE.Group(), navy = stdMat('m_navy'), orange = stdMat('m_orange');
+  const skin = ['#F1C9A5','#D9A47C','#B7814F','#8D5A3B','#F3D3B6','#C58C60'][i % 6];
+  const hair = ['#1B1B1F','#3A2A20','#5A3A22','#2B2B35','#7A5A3A'][i % 5];
+  const add = (geo, mat, x,y,z) => { const m = new THREE.Mesh(geo, mat); m.position.set(x,y,z); g.add(m); return m; };
+  add(new THREE.BoxGeometry(.15,.78,.18), navy, -.1,.39,0); add(new THREE.BoxGeometry(.15,.78,.18), navy, .1,.39,0);
+  add(new THREE.BoxGeometry(.42,.6,.24), navy, 0,1.08,0); add(new THREE.BoxGeometry(.44,.07,.26), orange, 0,1.3,0);
+  add(new THREE.BoxGeometry(.1,.56,.13), navy, -.27,1.06,0); add(new THREE.BoxGeometry(.1,.56,.13), navy, .27,1.06,0);
+  add(new THREE.BoxGeometry(.06,.08,.02), orange, .12,1.22,.125);
+  add(new THREE.SphereGeometry(.12,16,12), new THREE.MeshStandardMaterial({color:skin,roughness:.7}), 0,1.55,0);
+  add(new THREE.SphereGeometry(.128,16,8,0,Math.PI*2,0,Math.PI/2), new THREE.MeshStandardMaterial({color:hair,roughness:.8}), 0,1.565,-.005);
+  const [dx,dz] = facing(o);
+  g.position.set(o.position[0], o.position[1], -o.position[2]);
+  g.rotation.y = Math.atan2(dx, -dz);
+  return g;
+}
+function buildScene(){
+  scene = new THREE.Scene(); scene.background = new THREE.Color('#E8F0F8');
+  renderer = new THREE.WebGLRenderer({antialias:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  view.insertBefore(renderer.domElement, view.firstChild);
+  camera = new THREE.PerspectiveCamera(50, 1, .05, 80);
+  let avatarIdx = 0;
+  S.objects.forEach(o => {
+    const [sx,sy,sz] = o.scale;
+    let node;
+    if(o.type === 'avatar_humanoid'){
+      node = makeAvatar(o, avatarIdx++); scene.add(node);
+      const bid = o.id.replace('_avatar',''), hs = hsById['hs_' + bid];
+      node.traverse(m => { if(m.isMesh){ m.userData.hs = 'hs_' + bid; pickables.push(m); } });
+      return;
+    }
+    let geo, y = o.position[1] + sy/2;
+    if(o.type === 'avatar_pedestal') geo = new THREE.CylinderGeometry(sx/2, sx/2, sy, 24);
+    else geo = new THREE.BoxGeometry(sx, sy, sz);
+    let mat = stdMat(o.material_id || 'm_wall');
+    if(o.type === 'wall'){ mat.side = THREE.DoubleSide; if(o.id.startsWith('wall_south')){ mat.transparent = true; mat.opacity = .22; mat.depthWrite = false; } }
+    if(o.type === 'entry_portal'){ mat.transparent = true; mat.opacity = .55; }
+    if(o.type === 'logo_wall'){ mat = new THREE.MeshStandardMaterial({color:'#FFFFFF', roughness:.5}); }
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(o.position[0], y, -o.position[2]);
+    mesh.rotation.y = Math.atan2(Math.sin(o.rotation[1]), -Math.cos(o.rotation[1]));
+    scene.add(mesh);
+    if(o.type === 'chair'){
+      const [dx,dz] = facing(o), back = new THREE.Mesh(new THREE.BoxGeometry(.45,.45,.05), stdMat(o.material_id));
+      back.position.set(o.position[0]-dx*.2, o.position[1]+.65, -(o.position[2]-dz*.2)); back.rotation.y = Math.atan2(dx,-dz); scene.add(back);
+    }
+    if(o.type === 'waiting_sofa'){
+      const back = new THREE.Mesh(new THREE.BoxGeometry(sx,.5,.18), stdMat(o.material_id)); back.position.set(o.position[0], .8+.25, -(o.position[2]+.31)); scene.add(back);
+    }
+    if(['bot_desk','avatar_pedestal','meeting_table','waiting_sofa','floor_directory','display_stand','display_plinth','chair'].includes(o.type)){
+      solids.push([o.position[0]-sx/2, o.position[0]+sx/2, -(o.position[2]+sz/2), -(o.position[2]-sz/2)]);
+    }
+    if(o.type === 'logo_wall'){
+      const img = o.asset_url && !/^(\{\{|placeholder)/.test(o.asset_url) ? o.asset_url : null;
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(sz*.9, sy*.7), new THREE.MeshBasicMaterial({color:0xffffff, toneMapped:false}));
+      m.position.set(o.position[0]+sx/2+.006, o.position[1]+sy/2, -o.position[2]); m.rotation.y = Math.PI/2;
+      if(img) new THREE.TextureLoader().load(img, t => { m.material.map = t; m.material.needsUpdate = true; });
+      else m.material.map = labelTexture('GRM Network & Data Solutions\n\nOfficial logo image pending', (sz*.9)/(sy*.7), '#FFFFFF', '#242A3B');
+      scene.add(m);
+    } else if(TEXTED.includes(o.type)) addText(scene, o);
+  });
+  // zone floor tints and flat names
+  const flat = {z_reception:[5.4,1.8], z_gallery:[17,1.3], z_demo_left:[5.2,7.65], z_demo_right:[14.8,7.65], z_consult:[7.6,12.8], z_ops:[14.8,11.75]};
+  S.zones.forEach((z,i) => {
+    const t = new THREE.Mesh(new THREE.PlaneGeometry(z.size[0], z.size[2]), new THREE.MeshBasicMaterial({color:i%2 ? '#F79428' : '#78C2F0', transparent:true, opacity:.16, depthWrite:false}));
+    t.rotation.x = -Math.PI/2; t.position.set(z.center[0], .012, -z.center[2]); scene.add(t);
+    const p = flat[z.id]; if(p){
+      const l = new THREE.Mesh(new THREE.PlaneGeometry(2.6,.42), new THREE.MeshBasicMaterial({map:labelTexture(z.name, 2.6/.42, '#242A3B', '#FFFFFF'), transparent:true, opacity:.9, toneMapped:false}));
+      l.rotation.x = -Math.PI/2; l.position.set(p[0], .02, -p[1]); scene.add(l);
+    }
+  });
+  // lights from the scene file
+  S.lighting.forEach(l => {
+    const c = new THREE.Color(l.color || '#FFFFFF'); let L;
+    if(l.type === 'ambient'){ L = new THREE.AmbientLight(c, l.intensity); L.userData.k = 'amb'; }
+    else if(l.type === 'directional'){ L = new THREE.DirectionalLight(c, l.intensity); L.position.set(l.position[0]+6, 12, -l.position[2]+6); L.userData.k = 'dir'; }
+    else { L = new THREE.PointLight(c, l.intensity*(l.type === 'area' ? .45 : .6), l.type === 'area' ? 11 : 7, 2); L.position.set(l.position[0], l.position[1], -l.position[2]); L.userData.k = 'pt'; }
+    L.userData.base = l.intensity*(L.userData.k === 'pt' ? (l.type === 'area' ? .45 : .6) : 1);
+    scene.add(L); lights.push(L);
+  });
+  // hotspot markers
+  S.hotspots.forEach(h => {
+    const b = h.bot_id && botsById[h.bot_id];
+    const col = b ? (b.status === 'active' ? '#F79428' : '#9AA3B2') : '#78C2F0';
+    const m = new THREE.Mesh(new THREE.SphereGeometry(.09,16,12), new THREE.MeshBasicMaterial({color:col}));
+    m.position.set(h.position[0], h.position[1], -h.position[2]); m.userData.hs = h.id; scene.add(m); pickables.push(m); markers.push(m);
+  });
+  resize();
+}
+function resize(){
+  if(!renderer) return; const w = view.clientWidth, h = view.clientHeight; if(!w || !h) return;
+  renderer.setSize(w, h, false); camera.aspect = w/h; camera.updateProjectionMatrix();
+}
+function setNight(on){
+  night = on; $('#bDay').setAttribute('aria-pressed', on); $('#bDay').textContent = on ? 'Day lighting' : 'Night lighting';
+  if(!scene) return;
+  scene.background = new THREE.Color(on ? '#10131C' : '#E8F0F8');
+  lights.forEach(L => { const k = L.userData.k; L.intensity = L.userData.base * (on ? (k === 'pt' ? 1.7 : k === 'amb' ? .35 : .1) : 1); });
+}
+
+/* ---------- camera ---------- */
+const easeIO = t => t < .5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2)/2;
+function applyCamera(){
+  if(state.mode === 'overview'){
+    const o = state.orbit, c = Math.cos(o.el);
+    camera.position.set(o.target.x + o.r*Math.sin(o.az)*c, o.target.y + o.r*Math.sin(o.el), o.target.z + o.r*Math.cos(o.az)*c);
+    look.copy(o.target);
+  } else {
+    const w = state.walk, cp = Math.cos(w.pitch);
+    camera.position.copy(w.pos);
+    look.set(w.pos.x + Math.sin(w.yaw)*cp, w.pos.y + Math.sin(w.pitch), w.pos.z - Math.cos(w.yaw)*cp);
+  }
+  camera.lookAt(look);
+}
+function setPose(mode, pos, tgt){
+  state.mode = mode;
+  if(mode === 'overview'){
+    const d = pos.clone().sub(tgt), r = d.length();
+    Object.assign(state.orbit, {target:tgt.clone(), r, el:Math.asin(d.y/r), az:Math.atan2(d.x, d.z)});
+  } else {
+    const d = tgt.clone().sub(pos), l = d.length();
+    state.walk.pos.set(pos.x, 1.6, pos.z); state.walk.yaw = Math.atan2(d.x, -d.z); state.walk.pitch = Math.max(-.6, Math.min(.6, Math.asin(d.y/l)));
+  }
+  syncButtons(); applyCamera();
+}
+function flyTo(mode, pos, tgt){
+  if(!renderer){ return; }
+  if(reduce || !tween && !camera.position.lengthSq()){ tween = null; setPose(mode, pos, tgt); return; }
+  tween = {t:0, dur:.85, fp:camera.position.clone(), ft:look.clone(), tp:pos, tt:tgt, mode};
+}
+function gotoCam(id){
+  const c = camById[id]; if(!c) return;
+  showStage3D();
+  flyTo(id === 'cam_overview' ? 'overview' : 'walk', V(...c.position), V(...c.target));
+}
+function gotoStation(botId){
+  const av = objById[botId + '_avatar']; if(!av) return;
+  const [dx,dz] = facing(av), p = av.position;
+  const vx = Math.max(.5, Math.min(W-.5, p[0] + dx*2.6)), vz = Math.max(.5, Math.min(D-.5, p[2] + dz*2.6));
+  showStage3D();
+  flyTo('walk', V(vx,1.6,vz), V(p[0],1.3,p[2]));
+}
+function walkStep(dt){
+  const w = state.walk, sp = (keys.run ? 3.4 : 2.1)*dt;
+  let f = (keys.f ? 1:0) - (keys.b ? 1:0), r = (keys.r ? 1:0) - (keys.l ? 1:0);
+  if(keys.tl) w.yaw -= 1.6*dt; if(keys.tr) w.yaw += 1.6*dt;
+  if(!f && !r) return;
+  const dx = (Math.sin(w.yaw)*f + Math.cos(w.yaw)*r)*sp, dz = (-Math.cos(w.yaw)*f + Math.sin(w.yaw)*r)*sp;
+  const R = .28, hit = (x,z) => x < .4 || x > W-.4 || z > -.4 || z < -(D-.4) || solids.some(s => x > s[0]-R && x < s[1]+R && z > s[2]-R && z < s[3]+R);
+  if(!hit(w.pos.x+dx, w.pos.z)) w.pos.x += dx;
+  if(!hit(w.pos.x, w.pos.z+dz)) w.pos.z += dz;
+}
+function frame(ts){
+  if(!rendering) return;
+  const dt = Math.min(.05, (ts - last)/1000 || 0); last = ts;
+  if(tween){
+    tween.t += dt/tween.dur; const e = easeIO(Math.min(1, tween.t));
+    camera.position.lerpVectors(tween.fp, tween.tp, e); look.lerpVectors(tween.ft, tween.tt, e); camera.lookAt(look);
+    if(tween.t >= 1){ const t = tween; tween = null; setPose(t.mode, t.tp, t.tt); }
+  } else { if(state.mode === 'walk') walkStep(dt); applyCamera(); }
+  renderer.render(scene, camera);
+  requestAnimationFrame(frame);
+}
+function startLoop(){ if(rendering || !renderer) return; rendering = true; last = performance.now(); requestAnimationFrame(frame); }
+function stopLoop(){ rendering = false; }
+
+/* ---------- input ---------- */
+function bindInput(){
+  const el = renderer.domElement, ray = new THREE.Raycaster(), ptr = new THREE.Vector2();
+  let down = null, moved = false, hover = null;
+  const pick = (cx, cy) => {
+    const r = el.getBoundingClientRect(); ptr.set(((cx-r.left)/r.width)*2-1, -((cy-r.top)/r.height)*2+1);
+    ray.setFromCamera(ptr, camera); const h = ray.intersectObjects(pickables, false)[0]; return h ? h.object.userData.hs : null;
+  };
+  el.addEventListener('pointerdown', e => { down = {x:e.clientX, y:e.clientY}; moved = false; el.setPointerCapture(e.pointerId); tween = null; });
+  el.addEventListener('pointermove', e => {
+    if(down){
+      const dx = e.clientX - down.x, dy = e.clientY - down.y;
+      if(Math.abs(dx)+Math.abs(dy) > 3) moved = true;
+      down = {x:e.clientX, y:e.clientY};
+      if(state.mode === 'overview'){ const o = state.orbit; o.az -= dx*.006; o.el = Math.max(.15, Math.min(1.45, o.el + dy*.006)); }
+      else { const w = state.walk; w.yaw += dx*.005; w.pitch = Math.max(-.7, Math.min(.7, w.pitch - dy*.005)); }
+    } else {
+      const id = pick(e.clientX, e.clientY), tip = $('#tip');
+      if(id !== hover){ hover = id; el.style.cursor = id ? 'pointer' : 'grab'; }
+      if(id){ const r = view.getBoundingClientRect(); tip.textContent = hsById[id].label; tip.style.display = 'block'; tip.style.left = Math.min(r.width-270, e.clientX - r.left + 12) + 'px'; tip.style.top = (e.clientY - r.top + 12) + 'px'; }
+      else tip.style.display = 'none';
+    }
+  });
+  el.addEventListener('pointerup', e => { const wasDrag = moved; down = null; if(!wasDrag){ const id = pick(e.clientX, e.clientY); if(id) activate(id); } });
+  el.addEventListener('pointerleave', () => { $('#tip').style.display = 'none'; });
+  el.addEventListener('wheel', e => { if(state.mode === 'overview'){ e.preventDefault(); state.orbit.r = Math.max(7, Math.min(36, state.orbit.r*(1 + Math.sign(e.deltaY)*.08))); } }, {passive:false});
+  const map = {KeyW:'f', ArrowUp:'f', KeyS:'b', ArrowDown:'b', KeyA:'l', ArrowLeft:'l', KeyD:'r', ArrowRight:'r', KeyQ:'tl', KeyE:'tr'};
+  view.addEventListener('keydown', e => {
+    const k = map[e.code];
+    if(e.key === 'Shift') keys.run = true;
+    if(state.mode === 'overview' && k){ const o = state.orbit; if(k==='l') o.az -= .12; if(k==='r') o.az += .12; if(k==='f') o.r = Math.max(7, o.r-1.2); if(k==='b') o.r = Math.min(36, o.r+1.2); e.preventDefault(); return; }
+    if(k){ keys[k] = true; tween = null; e.preventDefault(); }
+  });
+  view.addEventListener('keyup', e => { const k = map[e.code]; if(k) keys[k] = false; if(e.key === 'Shift') keys.run = false; });
+  view.addEventListener('blur', () => { keys = {}; });
+  document.querySelectorAll('#pad button').forEach(b => {
+    const k = b.dataset.k, on = e => { e.preventDefault(); keys[k] = true; tween = null; }, off = () => { keys[k] = false; };
+    b.addEventListener('pointerdown', on); b.addEventListener('pointerup', off); b.addEventListener('pointerleave', off); b.addEventListener('pointercancel', off);
+  });
+  new ResizeObserver(resize).observe(view);
+}
+
+/* ---------- views ---------- */
+let mapMode = false;
+function syncButtons(){
+  $('#bOverview').setAttribute('aria-pressed', !mapMode && state.mode === 'overview');
+  $('#bWalk').setAttribute('aria-pressed', !mapMode && state.mode === 'walk');
+  $('#bMap').setAttribute('aria-pressed', mapMode);
+  $('#pad').classList.toggle('on', !mapMode && state.mode === 'walk' && matchMedia('(pointer:coarse)').matches);
+  $('#hint').textContent = state.mode === 'walk' ? 'Walk: W A S D or arrow keys to move, Q / E or drag to turn. Select an orange or blue marker for details.' : 'Overview: drag to orbit, scroll or +/- keys to zoom. Select a marker, or choose a station on the right.';
+}
+function showStage3D(){ if(!hasGL) return showMap(); mapMode = false; $('#map').hidden = true; view.hidden = false; resize(); startLoop(); syncButtons(); }
+function showMap(){ mapMode = true; view.hidden = true; $('#map').hidden = false; stopLoop(); drawMap(); syncButtons(); }
+function drawMap(){
+  const k = 40, x = v => v*k, y = v => (D - v)*k;
+  let s = '<svg viewBox="0 0 ' + W*k + ' ' + (D*k + 30) + '" role="group" aria-label="Floor 3 plan, north at top"><rect x="0" y="0" width="' + W*k + '" height="' + D*k + '" fill="none" stroke="currentColor" stroke-opacity=".5" stroke-width="2" style="color:var(--map-ink)"/>';
+  S.zones.forEach((z,i) => { const x0 = z.center[0]-z.size[0]/2, z1 = z.center[2]+z.size[2]/2;
+    s += '<rect class="zone" x="' + x(x0) + '" y="' + y(z1) + '" width="' + x(z.size[0]) + '" height="' + x(z.size[2]) + '" rx="6" fill="' + (i%2 ? 'var(--zone-b)' : 'var(--zone-a)') + '" fill-opacity=".2"/><text x="' + (x(x0)+8) + '" y="' + (y(z1)-5) + '" font-size="12" font-weight="600">' + esc(z.name) + '</text>'; });
+  s += '<line x1="' + x(10) + '" y1="' + y(1.6) + '" x2="' + x(10) + '" y2="' + y(14.3) + '" stroke="var(--map-ink)" stroke-opacity=".4" stroke-dasharray="6 6"/>';
+  s += '<rect x="' + (x(10)-40) + '" y="' + (y(0)-3) + '" width="80" height="6" fill="var(--sky)"/><text x="' + x(10) + '" y="' + (y(0)+22) + '" font-size="12" text-anchor="middle">Entrance (south)</text>';
+  S.bots.forEach(b => { const d = objById[b.id + '_desk'], a = objById[b.id + '_avatar']; if(!d) return; const cx = x(d.position[0]), cy = y(a.position[2]);
+    const act = b.status === 'active';
+    s += '<g class="st" tabindex="0" role="button" data-bot="' + b.id + '" aria-label="' + esc(b.name + ', ' + b.role + ', ' + (act ? 'active' : 'planned')) + '"><circle cx="' + cx + '" cy="' + cy + '" r="15" fill="' + (act ? 'var(--orange)' : 'var(--surface)') + '" stroke="' + (act ? 'var(--orange)' : 'var(--map-ink)') + '" stroke-width="2"/><text x="' + cx + '" y="' + (cy+4) + '" font-size="10" font-weight="700" text-anchor="middle" style="fill:' + (act ? '#1B1B1B' : 'var(--map-ink)') + '">' + esc(b.name.split(' ')[1].slice(0,4)) + '</text></g>'; });
+  s += '</svg>';
+  $('#map').innerHTML = s;
+  $('#map').querySelectorAll('.st').forEach(g => { const go = () => activate('hs_' + g.dataset.bot); g.addEventListener('click', go); g.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); go(); } }); });
+}
+
+/* ---------- info panel ---------- */
+const panel = $('#panel');
+function dispatchAction(h){
+  const ev = new CustomEvent('grm:action', {cancelable:true, detail:{action_type:h.action_type, action_target:h.action_target, bot_id:h.bot_id || null}});
+  return window.dispatchEvent(ev);   // false when a host app handled it
+}
+function botCard(b, h){
+  const act = b.status === 'active';
+  const btn = act ? '<button class="btn solid" id="doAction" type="button">Talk to ' + esc(b.name) + '</button>' : '<button class="btn" id="doAction" type="button">View planned demo</button>';
+  panel.innerHTML = '<span class="badge ' + b.status + '">' + (act ? 'Active' : 'Planned · demonstration only') + '</span><h2>' + esc(b.name) + '</h2><p class="muted">' + esc(b.role) + ' · ' + esc(zonesById[b.station_zone_id].name) + '</p>' +
+    '<h3>What it does</h3><ul>' + b.capabilities.map(c => '<li>' + esc(c) + '</li>').join('') + '</ul>' +
+    '<p>' + btn + '</p><p class="muted" id="actionNote">Action key: <code>' + esc(h.action_target) + '</code></p>' +
+    '<p class="muted">Public visitors see general information only. Billing, HR, subscriber, network and analytics data need an authorized sign-in.</p>';
+  $('#doAction').addEventListener('click', () => {
+    const handled = !dispatchAction(h);
+    if(!handled) $('#actionNote').textContent = act ? 'Preview only: no live chat is connected to this viewer yet. A host app can listen for the "grm:action" event (' + h.action_target + ').' : 'This station is planned. It is not connected to live accounts, equipment or customer data.';
+  });
+}
+function plansRows(){ return S.objects.filter(o => o.type === 'plan_card').map(o => o.label.split(' – ')); }
+function showInfo(key, h){
+  const rows = plansRows(), phoneObj = objById.support_phone_sign, phone = phoneObj ? phoneObj.label.split(': ')[1] : '';
+  const C = {
+    internet_plans: ['Internet plans', '<table><thead><tr><th>Speed</th><th>Monthly</th></tr></thead><tbody>' + rows.map(r => '<tr><td>' + esc(r[0]) + '</td><td>' + esc(r[1].replace('/month','')) + '</td></tr>').join('') + '</tbody></table><p class="muted">Rates come from a GRM promotional image. Verify before public launch.</p>'],
+    support_phone: ['Customer support', '<p style="font-size:1.3rem;font-family:var(--font-head)" id="ph">' + esc(phone) + '</p><p><button class="btn" id="copyPh" type="button">Copy number</button></p>'],
+    floor_directory: ['Floor 3 directory', '<ul>' + S.zones.map(z => '<li><b>' + esc(z.name) + '</b><br><span class="muted">' + esc(z.purpose) + '</span></li>').join('') + '</ul><p class="muted">Floor selector links to other floors are not set yet.</p>'],
+    website_link_pending: ['Website', '<p>The website address has not been supplied yet, so this sign has no link.</p>'],
+    facebook_link_pending: ['Facebook page', '<p>The Facebook page address has not been supplied yet, so this sign has no link.</p>'],
+    operations_dashboard_placeholder: ['Operations dashboard', '<p>Placeholder wall with sample data only. It is not connected to subscriber, billing or network systems.</p>'],
+    ftth: ['How fiber to the home works', '<p class="muted">Illustration, not a live network view.</p><ol><li>OLT at the provider\'s facility sends light down the fiber.</li><li>A splitter shares the fiber between nearby homes.</li><li>The ONT at the home converts light to Ethernet.</li><li>The router shares the connection over Wi-Fi.</li></ol><p>A red LOS light on the ONT means it is not receiving a signal; GRM TESS handles those reports.</p>'],
+    scenario: ['Scenario wall', '<p>Sample, non-personal scenarios: a Red LOS report becoming a ticket, a work order being scheduled, and a stock check. These are demonstrations, not live connections.</p>'],
+    lobby: ['Return to Lobby', '<p>This takes you back to the Floor 3 entrance. A link to the building lobby has not been set yet.</p>']
+  };
+  const c = C[key] || [h.label, '<p class="muted">Action key: <code>' + esc(h.action_target) + '</code></p>'];
+  panel.innerHTML = '<h2>' + esc(c[0]) + '</h2>' + c[1];
+  const cp = $('#copyPh'); if(cp) cp.addEventListener('click', () => { const t = $('#ph').textContent; const ok = () => cp.textContent = 'Copied'; if(navigator.clipboard) navigator.clipboard.writeText(t).then(ok, () => {}); });
+}
+function activate(id, opts){
+  const h = hsById[id]; if(!h) return;
+  if(h.bot_id && botsById[h.bot_id] && h.id === 'hs_' + h.bot_id){ botCard(botsById[h.bot_id], h); if(!mapMode) gotoStation(h.bot_id); }
+  else {
+    const t = h.action_target;
+    if(id === 'hs_book_consultation'){ botCard(botsById.grm_ace, h); }
+    else if(t === 'play_demo:guided_tour'){ startTour(); return; }
+    else if(t === 'play_demo:ftth_explainer') showInfo('ftth', h);
+    else if(t === 'play_demo:scenario_wall_samples') showInfo('scenario', h);
+    else if(id === 'hs_return_lobby') showInfo('lobby', h);
+    else showInfo(t.replace(/^open_info_panel:/,''), h);
+    if(!mapMode && HS_CAM[id]) gotoCam(HS_CAM[id]);
+  }
+  if(!(opts && opts.quiet)) panel.focus({preventScroll:true});
+}
+
+/* ---------- tour ---------- */
+let tourI = -1;
+function tourStep(i){
+  tourI = Math.max(0, Math.min(S.visitor_route.length-1, i));
+  const key = S.visitor_route[tourI], z = zonesById[key];
+  $('#tour').classList.add('on');
+  $('#tourText').innerHTML = '<b>Stop ' + (tourI+1) + ' of ' + S.visitor_route.length + ':</b> ' + esc(z ? z.name + '. ' + z.purpose : key === 'entry_portal' ? 'Virtual entrance on the south side. Start here.' : 'Back at the entrance. Use Return to Lobby any time.');
+  $('#tBack').disabled = tourI === 0; $('#tNext').disabled = tourI === S.visitor_route.length-1;
+  if(!mapMode) gotoCam(ROUTE_CAM[key]);
+}
+function startTour(){ if(mapMode && hasGL && matchMedia('(min-width:721px)').matches) showStage3D(); tourStep(0); }
+function stopTour(){ tourI = -1; $('#tour').classList.remove('on'); }
+
+/* ---------- lists ---------- */
+function buildLists(){
+  const order = S.bots.slice().sort((a,b) => (a.status === b.status ? 0 : a.status === 'active' ? -1 : 1));
+  $('#botList').innerHTML = order.map(b => '<button type="button" data-bot="' + b.id + '"><span class="nm"><b>' + esc(b.name) + '</b><span>' + esc(b.role) + '</span></span><span class="badge ' + b.status + '">' + (b.status === 'active' ? 'Active' : 'Planned') + '</span></button>').join('');
+  $('#botList').querySelectorAll('button').forEach(b => b.addEventListener('click', () => activate('hs_' + b.dataset.bot)));
+  $('#poiList').innerHTML = POI.map(id => '<button type="button" data-hs="' + id + '"><span class="nm"><b>' + esc(hsById[id].label) + '</b></span></button>').join('');
+  $('#poiList').querySelectorAll('button').forEach(b => b.addEventListener('click', () => activate(b.dataset.hs)));
+}
+
+/* ---------- boot ---------- */
+function intro(){
+  panel.innerHTML = '<h2>Welcome to Floor 3</h2><p>Explore GRM\'s virtual headquarters. Each desk is an AI employee; select a marker or a name in the list to see what it does.</p><p class="muted">Orange markers are active stations. Grey markers are planned demonstrations.</p>';
+}
+$('#disclaimer').textContent = S.assumptions[0] + ' Plans and phone number come from a user-provided GRM image; verify before public launch.';
+buildLists(); intro();
+$('#bOverview').addEventListener('click', () => gotoCam('cam_overview'));
+$('#bWalk').addEventListener('click', () => gotoCam('cam_entry'));
+$('#bMap').addEventListener('click', showMap);
+$('#bTour').addEventListener('click', startTour);
+$('#bDay').addEventListener('click', () => setNight(!night));
+$('#bLobby').addEventListener('click', () => { stopTour(); activate('hs_return_lobby', {quiet:true}); if(mapMode) return; gotoCam('cam_entry'); });
+$('#tBack').addEventListener('click', () => tourStep(tourI-1));
+$('#tNext').addEventListener('click', () => tourStep(tourI+1));
+$('#tStop').addEventListener('click', stopTour);
+if(hasGL){
+  buildScene(); bindInput();
+  const c = camById.cam_overview; setPose('overview', V(...c.position), V(...c.target));
+  const small = matchMedia('(max-width:720px)').matches;
+  if(small) showMap(); else showStage3D();
+} else { $('#bOverview').disabled = true; $('#bWalk').disabled = true; $('#bDay').disabled = true; showMap(); }
+window.GRM = {activate, gotoCam, gotoStation, setNight, showMap, showStage3D, startTour, state};
+})();
+</script>
+</body></html>

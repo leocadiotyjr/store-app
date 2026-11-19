@@ -8,7 +8,7 @@
   "assumptions": [
     "All geometry is a conceptual virtual envelope (20 m × 15 m × 3.2 m), not a building survey; no construction, fire-safety, load or accessibility-code compliance is claimed. Licensed professionals must verify any physical use.",
     "Fixed elements (columns, stairs, windows, elevators, fire exits) were not supplied and are not assumed; all shell walls are virtual and need verification.",
-    "Coordinates: metres, origin at floor southwest corner, x east, z north, y up. Object position = bottom-centre of its bounding box (wall-mounted items: their own centre); scale = bounding-box size in metres; rotation = radians (y = 0 faces north).",
+    "Coordinates: metres, origin at floor southwest corner, x east, z north, y up. Object position = bottom-centre of its bounding box (wall-mounted and hanging items included); scale = bounding-box size in metres; rotation = radians (y = 0 faces north).",
     "Zone bounds convert the template percentages to metres of the 20 × 15 m envelope; zone size is [width, ceiling height, depth].",
     "Entry is a virtual portal at the south wall centre (x = 10, z = 0). Exit location was not supplied; a conceptual return-to-lobby portal and always-visible HUD control are provided, flagged as not real egress. The building lobby link and adjacent-floor links are empty and pending.",
     "A 1.2 m centre aisle (x 9.4–10.6) is kept clear between the two demo wings; 13 bots are grouped by department across six zones to avoid crowding the route.",
