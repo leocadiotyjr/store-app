@@ -1,0 +1,3396 @@
+{
+  "project": {
+    "business_name": "GRM Network & Data Solutions",
+    "niche": "Fiber-to-the-home (FTTH) Internet Service Provider (ISP)",
+    "theme_name": "GRM AI-Powered Virtual ISP Headquarters & Showroom",
+    "floor_label": "Floor 3"
+  },
+  "assumptions": [
+    "All geometry is a conceptual virtual envelope (20 m × 15 m × 3.2 m), not a building survey; no construction, fire-safety, load or accessibility-code compliance is claimed. Licensed professionals must verify any physical use.",
+    "Fixed elements (columns, stairs, windows, elevators, fire exits) were not supplied and are not assumed; all shell walls are virtual and need verification.",
+    "Coordinates: metres, origin at floor southwest corner, x east, z north, y up. Object position = bottom-centre of its bounding box (wall-mounted items: their own centre); scale = bounding-box size in metres; rotation = radians (y = 0 faces north).",
+    "Zone bounds convert the template percentages to metres of the 20 × 15 m envelope; zone size is [width, ceiling height, depth].",
+    "Entry is a virtual portal at the south wall centre (x = 10, z = 0). Exit location was not supplied; a conceptual return-to-lobby portal and always-visible HUD control are provided, flagged as not real egress. The building lobby link and adjacent-floor links are empty and pending.",
+    "A 1.2 m centre aisle (x 9.4–10.6) is kept clear between the two demo wings; 13 bots are grouped by department across six zones to avoid crowding the route.",
+    "Website and Facebook URLs were not supplied, so those signs are labeled link-pending info panels; no URLs were invented. The logo asset path is the placeholder {{GRM_LOGO_ASSET_URL}} and the official logo must be used unaltered.",
+    "Internet plans (55/105/155/205/305 Mbps at PHP 999/1,299/1,499/1,999/2,499 per month) and support phone 0993 291 3471 come from a user-provided GRM promotional image; verify before public launch.",
+    "Active bots at launch: GIA, ACE, FINN, TESS, OMAR (open_bot_chat:<id> keys must be implemented by the host app). The other 8 are planned/demo-only; their hotspots open an info panel and they are not claimed to modify live accounts or network settings.",
+    "In-app action keys (play_demo:*, open_info_panel:*, open_bot_chat:*) are contract names for the host app to implement; none are claimed as already implemented.",
+    "Public kiosks show general service information, public plans and sample non-personal data only. Billing, HR, subscriber data, NOC controls and analytics need authenticated authorized access; network changes, financial adjustments, disconnections and sensitive personnel decisions need human approval.",
+    "Initial camera is placed south of the floor looking north so the entrance is in the foreground; the template's relative z of 1.35 (north side) was mirrored for that reason.",
+    "Lighting values describe the day preset; a night preset should lower ambient/directional and raise spot and area intensity. Avatar GLB assets are placeholders (placeholder://) to be supplied.",
+    "Possible future integrations (CRM, Google Sheets, Slack, n8n, ISP equipment management) are not asserted as connected."
+  ],
+  "floor": {
+    "width_m": 20,
+    "depth_m": 15,
+    "ceiling_height_m": 3.2,
+    "entry_side": "south",
+    "fixed_elements": [
+      "Not provided – no columns, stairs, windows, elevators or fire exits assumed; verification required"
+    ]
+  },
+  "zones": [
+    {
+      "id": "z_reception",
+      "name": "Reception & Welcome",
+      "center": [
+        4.0,
+        1.6,
+        2.4
+      ],
+      "size": [
+        6.0,
+        3.2,
+        3.3
+      ],
+      "purpose": "Welcome area with official logo wall, floor directory and the GRM GIA receptionist; starts the guided tour."
+    },
+    {
+      "id": "z_gallery",
+      "name": "GRM Brand & FTTH Gallery",
+      "center": [
+        13.3,
+        1.6,
+        2.4
+      ],
+      "size": [
+        11.4,
+        3.2,
+        3.3
+      ],
+      "purpose": "Brand tagline, public internet plans wall, FTTH explainer, ONT/router display, website and Facebook placeholders, plus GRM MAYA."
+    },
+    {
+      "id": "z_demo_left",
+      "name": "AI Bot Demo Wing A",
+      "center": [
+        5.2,
+        1.6,
+        7.65
+      ],
+      "size": [
+        8.4,
+        3.2,
+        5.7
+      ],
+      "purpose": "Sales, finance, collections, HR and documents/compliance stations (ACE, FINN, CLEO, HANA, LEX)."
+    },
+    {
+      "id": "z_demo_right",
+      "name": "AI Bot Demo Wing B",
+      "center": [
+        14.8,
+        1.6,
+        7.65
+      ],
+      "size": [
+        8.4,
+        3.2,
+        5.7
+      ],
+      "purpose": "Technical, network, field and inventory stations (TESS, NEO, MAX, IVY) and an interactive scenario wall."
+    },
+    {
+      "id": "z_consult",
+      "name": "Consultation & Demo Meeting",
+      "center": [
+        5.2,
+        1.6,
+        12.825
+      ],
+      "size": [
+        8.4,
+        3.2,
+        2.85
+      ],
+      "purpose": "Meeting table for consultations and demos; call-to-action to start an application with GRM ACE; support phone sign."
+    },
+    {
+      "id": "z_ops",
+      "name": "AI Operations Dashboard",
+      "center": [
+        14.8,
+        1.6,
+        12.825
+      ],
+      "size": [
+        8.4,
+        3.2,
+        2.85
+      ],
+      "purpose": "Operations dashboard wall (placeholder, sample data only), automation flow visual, GRM OMAR and GRM DEX."
+    }
+  ],
+  "bots": [
+    {
+      "id": "grm_gia",
+      "name": "GRM GIA",
+      "role": "AI Receptionist",
+      "station_zone_id": "z_reception",
+      "capabilities": [
+        "Welcomes visitors",
+        "Explains plans",
+        "Directs inquiries",
+        "Starts applications"
+      ],
+      "demo_action_key": "open_bot_chat:grm_gia",
+      "avatar_asset": "placeholder://avatars/grm_gia.glb",
+      "status": "active"
+    },
+    {
+      "id": "grm_ace",
+      "name": "GRM ACE",
+      "role": "AI Sales Consultant",
+      "station_zone_id": "z_demo_left",
+      "capabilities": [
+        "Qualifies leads",
+        "Recommends packages",
+        "Captures applications",
+        "Prepares installation requests"
+      ],
+      "demo_action_key": "open_bot_chat:grm_ace",
+      "avatar_asset": "placeholder://avatars/grm_ace.glb",
+      "status": "active"
+    },
+    {
+      "id": "grm_maya",
+      "name": "GRM MAYA",
+      "role": "AI Social Media Manager",
+      "station_zone_id": "z_gallery",
+      "capabilities": [
+        "Drafts Facebook campaigns",
+        "Drafts content calendars and announcements",
+        "Prepares analytics reports",
+        "Status: planned – demonstration only; not connected to live systems"
+      ],
+      "demo_action_key": "play_demo:grm_maya_planned_preview",
+      "avatar_asset": "placeholder://avatars/grm_maya.glb",
+      "status": "planned"
+    },
+    {
+      "id": "grm_finn",
+      "name": "GRM FINN",
+      "role": "AI Finance Officer",
+      "station_zone_id": "z_demo_left",
+      "capabilities": [
+        "Prepares statements of account (SOAs)",
+        "Monitors receivables",
+        "Reconciles verified payments",
+        "Tracks expenses"
+      ],
+      "demo_action_key": "open_bot_chat:grm_finn",
+      "avatar_asset": "placeholder://avatars/grm_finn.glb",
+      "status": "active"
+    },
+    {
+      "id": "grm_hana",
+      "name": "GRM HANA",
+      "role": "AI HR Officer",
+      "station_zone_id": "z_demo_left",
+      "capabilities": [
+        "Drafts SOPs",
+        "Supports recruitment",
+        "Supports training and attendance",
+        "Approved personnel administration",
+        "Status: planned – demonstration only; not connected to live systems"
+      ],
+      "demo_action_key": "play_demo:grm_hana_planned_preview",
+      "avatar_asset": "placeholder://avatars/grm_hana.glb",
+      "status": "planned"
+    },
+    {
+      "id": "grm_neo",
+      "name": "GRM NEO",
+      "role": "AI Network Engineer",
+      "station_zone_id": "z_demo_right",
+      "capabilities": [
+        "Interprets OLT and ONT status",
+        "Reads optical alarms",
+        "Flags outages",
+        "Suggests troubleshooting",
+        "Status: planned – demonstration only; not connected to live systems"
+      ],
+      "demo_action_key": "play_demo:grm_neo_planned_preview",
+      "avatar_asset": "placeholder://avatars/grm_neo.glb",
+      "status": "planned"
+    },
+    {
+      "id": "grm_tess",
+      "name": "GRM TESS",
+      "role": "AI Technical Support",
+      "station_zone_id": "z_demo_right",
+      "capabilities": [
+        "Handles Red LOS reports",
+        "Handles slow connection reports",
+        "Creates tickets",
+        "Escalates cases"
+      ],
+      "demo_action_key": "open_bot_chat:grm_tess",
+      "avatar_asset": "placeholder://avatars/grm_tess.glb",
+      "status": "active"
+    },
+    {
+      "id": "grm_max",
+      "name": "GRM MAX",
+      "role": "AI Field Operations Coordinator",
+      "station_zone_id": "z_demo_right",
+      "capabilities": [
+        "Prepares work orders",
+        "Schedules installations and repairs",
+        "Tracks field completion",
+        "Status: planned – demonstration only; not connected to live systems"
+      ],
+      "demo_action_key": "play_demo:grm_max_planned_preview",
+      "avatar_asset": "placeholder://avatars/grm_max.glb",
+      "status": "planned"
+    },
+    {
+      "id": "grm_cleo",
+      "name": "GRM CLEO",
+      "role": "AI Collection Officer",
+      "station_zone_id": "z_demo_left",
+      "capabilities": [
+        "Tracks overdue accounts",
+        "Prepares reminders",
+        "Records payment promises",
+        "Status: planned – demonstration only; not connected to live systems"
+      ],
+      "demo_action_key": "play_demo:grm_cleo_planned_preview",
+      "avatar_asset": "placeholder://avatars/grm_cleo.glb",
+      "status": "planned"
+    },
+    {
+      "id": "grm_ivy",
+      "name": "GRM IVY",
+      "role": "AI Inventory & Procurement Officer",
+      "station_zone_id": "z_demo_right",
+      "capabilities": [
+        "Tracks ONTs, routers and fiber cables",
+        "Tracks tools and suppliers",
+        "Tracks stock movements",
+        "Status: planned – demonstration only; not connected to live systems"
+      ],
+      "demo_action_key": "play_demo:grm_ivy_planned_preview",
+      "avatar_asset": "placeholder://avatars/grm_ivy.glb",
+      "status": "planned"
+    },
+    {
+      "id": "grm_lex",
+      "name": "GRM LEX",
+      "role": "AI Documents & Compliance Officer",
+      "station_zone_id": "z_demo_left",
+      "capabilities": [
+        "Organizes service agreements",
+        "Organizes subscriber documentation",
+        "Organizes permits and compliance records",
+        "Status: planned – demonstration only; not connected to live systems"
+      ],
+      "demo_action_key": "play_demo:grm_lex_planned_preview",
+      "avatar_asset": "placeholder://avatars/grm_lex.glb",
+      "status": "planned"
+    },
+    {
+      "id": "grm_dex",
+      "name": "GRM DEX",
+      "role": "AI Business Intelligence Analyst",
+      "station_zone_id": "z_ops",
+      "capabilities": [
+        "Analyzes subscribers and churn",
+        "Analyzes revenues and operating costs",
+        "Tracks department KPIs",
+        "Status: planned – demonstration only; not connected to live systems"
+      ],
+      "demo_action_key": "play_demo:grm_dex_planned_preview",
+      "avatar_asset": "placeholder://avatars/grm_dex.glb",
+      "status": "planned"
+    },
+    {
+      "id": "grm_omar",
+      "name": "GRM OMAR",
+      "role": "AI Operations Manager",
+      "station_zone_id": "z_ops",
+      "capabilities": [
+        "Coordinates teams",
+        "Reviews escalations",
+        "Prepares management summaries for Slack"
+      ],
+      "demo_action_key": "open_bot_chat:grm_omar",
+      "avatar_asset": "placeholder://avatars/grm_omar.glb",
+      "status": "active"
+    }
+  ],
+  "objects": [
+    {
+      "id": "floor_slab",
+      "type": "floor",
+      "position": [
+        10,
+        -0.1,
+        7.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        20,
+        0.1,
+        15
+      ],
+      "material_id": "m_floor",
+      "label": "Conceptual floor slab"
+    },
+    {
+      "id": "wall_north",
+      "type": "wall",
+      "position": [
+        10,
+        0,
+        14.95
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        20,
+        3.2,
+        0.1
+      ],
+      "material_id": "m_wall"
+    },
+    {
+      "id": "wall_south_west",
+      "type": "wall",
+      "position": [
+        4.5,
+        0,
+        0.05
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        9,
+        3.2,
+        0.1
+      ],
+      "material_id": "m_wall"
+    },
+    {
+      "id": "wall_south_east",
+      "type": "wall",
+      "position": [
+        15.5,
+        0,
+        0.05
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        9,
+        3.2,
+        0.1
+      ],
+      "material_id": "m_wall"
+    },
+    {
+      "id": "wall_west",
+      "type": "wall",
+      "position": [
+        0.05,
+        0,
+        7.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.1,
+        3.2,
+        15
+      ],
+      "material_id": "m_wall"
+    },
+    {
+      "id": "wall_east",
+      "type": "wall",
+      "position": [
+        19.95,
+        0,
+        7.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.1,
+        3.2,
+        15
+      ],
+      "material_id": "m_wall"
+    },
+    {
+      "id": "entry_portal",
+      "type": "entry_portal",
+      "position": [
+        10,
+        0,
+        0.2
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        2.0,
+        2.4,
+        0.2
+      ],
+      "material_id": "m_sky",
+      "label": "Virtual visitor entrance (south) – not a surveyed door"
+    },
+    {
+      "id": "return_portal_sign",
+      "type": "hanging_sign",
+      "position": [
+        10,
+        2.6,
+        0.5
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.6,
+        0.3,
+        0.05
+      ],
+      "material_id": "m_navy",
+      "label": "Return to Lobby / Exit (conceptual)"
+    },
+    {
+      "id": "logo_wall",
+      "type": "logo_wall",
+      "position": [
+        0.2,
+        0,
+        2.4
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.2,
+        2.8,
+        3.2
+      ],
+      "material_id": "m_white",
+      "asset_url": "{{GRM_LOGO_ASSET_URL}}",
+      "zone_id": "z_reception",
+      "label": "GRM Network & Data Solutions – official logo, unaltered"
+    },
+    {
+      "id": "reception_sofa",
+      "type": "waiting_sofa",
+      "position": [
+        2.4,
+        0,
+        1.25
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.8,
+        0.8,
+        0.8
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_reception",
+      "label": "Visitor waiting sofa"
+    },
+    {
+      "id": "floor_directory",
+      "type": "floor_directory",
+      "position": [
+        6.4,
+        0,
+        1.3
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.8,
+        2.0,
+        0.3
+      ],
+      "material_id": "m_navy",
+      "zone_id": "z_reception",
+      "label": "Floor 3 directory (floor selector links pending)"
+    },
+    {
+      "id": "tagline_banner",
+      "type": "hanging_sign",
+      "position": [
+        10,
+        2.4,
+        4.4
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        3.0,
+        0.6,
+        0.05
+      ],
+      "material_id": "m_orange",
+      "zone_id": "z_gallery",
+      "label": "Connecting Homes. Empowering Lives."
+    },
+    {
+      "id": "website_preview_screen",
+      "type": "wall_screen",
+      "position": [
+        12.2,
+        1.0,
+        0.2
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        2.0,
+        1.2,
+        0.1
+      ],
+      "material_id": "m_navy",
+      "zone_id": "z_gallery",
+      "label": "Website preview – URL pending"
+    },
+    {
+      "id": "facebook_page_sign",
+      "type": "wall_sign",
+      "position": [
+        14.6,
+        1.0,
+        0.2
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.4,
+        1.2,
+        0.1
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_gallery",
+      "label": "Facebook page – URL pending"
+    },
+    {
+      "id": "ftth_explainer_display",
+      "type": "display_stand",
+      "position": [
+        12.8,
+        0,
+        2.6
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        2.4,
+        1.8,
+        0.3
+      ],
+      "material_id": "m_navy",
+      "zone_id": "z_gallery",
+      "label": "FTTH path explainer: OLT → splitter → ONT → router"
+    },
+    {
+      "id": "ont_router_plinth",
+      "type": "display_plinth",
+      "position": [
+        14.8,
+        0,
+        2.6
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        0.8
+      ],
+      "material_id": "m_white",
+      "zone_id": "z_gallery",
+      "label": "Sample ONT and router (generic models)"
+    },
+    {
+      "id": "plans_wall",
+      "type": "plans_wall",
+      "position": [
+        19.8,
+        0,
+        2.4
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.2,
+        2.4,
+        3.2
+      ],
+      "material_id": "m_navy",
+      "zone_id": "z_gallery",
+      "label": "GRM internet plans – verify rates before public launch"
+    },
+    {
+      "id": "plan_card_55",
+      "type": "plan_card",
+      "position": [
+        19.62,
+        1.2,
+        1.1
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.1,
+        1.0,
+        0.55
+      ],
+      "material_id": "m_orange",
+      "zone_id": "z_gallery",
+      "label": "55 Mbps – PHP 999/month"
+    },
+    {
+      "id": "plan_card_105",
+      "type": "plan_card",
+      "position": [
+        19.62,
+        1.2,
+        1.75
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.1,
+        1.0,
+        0.55
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_gallery",
+      "label": "105 Mbps – PHP 1,299/month"
+    },
+    {
+      "id": "plan_card_155",
+      "type": "plan_card",
+      "position": [
+        19.62,
+        1.2,
+        2.4
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.1,
+        1.0,
+        0.55
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_gallery",
+      "label": "155 Mbps – PHP 1,499/month"
+    },
+    {
+      "id": "plan_card_205",
+      "type": "plan_card",
+      "position": [
+        19.62,
+        1.2,
+        3.05
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.1,
+        1.0,
+        0.55
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_gallery",
+      "label": "205 Mbps – PHP 1,999/month"
+    },
+    {
+      "id": "plan_card_305",
+      "type": "plan_card",
+      "position": [
+        19.62,
+        1.2,
+        3.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.1,
+        1.0,
+        0.55
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_gallery",
+      "label": "305 Mbps – PHP 2,499/month"
+    },
+    {
+      "id": "wing_a_sign",
+      "type": "hanging_sign",
+      "position": [
+        5.2,
+        2.5,
+        7.65
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        2.4,
+        0.4,
+        0.05
+      ],
+      "material_id": "m_navy",
+      "zone_id": "z_demo_left",
+      "label": "AI Bot Demo Wing A"
+    },
+    {
+      "id": "wing_b_sign",
+      "type": "hanging_sign",
+      "position": [
+        14.8,
+        2.5,
+        7.65
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        2.4,
+        0.4,
+        0.05
+      ],
+      "material_id": "m_navy",
+      "zone_id": "z_demo_right",
+      "label": "AI Bot Demo Wing B"
+    },
+    {
+      "id": "wing_a_scenario_screen",
+      "type": "wall_screen",
+      "position": [
+        0.25,
+        1.2,
+        7.65
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.1,
+        1.4,
+        2.4
+      ],
+      "material_id": "m_navy",
+      "zone_id": "z_demo_left",
+      "label": "Wing A scenario screen – sample, non-personal demos"
+    },
+    {
+      "id": "interactive_demo_wall",
+      "type": "interactive_wall",
+      "position": [
+        19.8,
+        0,
+        7.65
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.2,
+        2.6,
+        4.0
+      ],
+      "material_id": "m_navy",
+      "zone_id": "z_demo_right",
+      "label": "Interactive scenario wall – sample troubleshooting, work-order and stock demos (not live)"
+    },
+    {
+      "id": "meeting_table",
+      "type": "meeting_table",
+      "position": [
+        4.5,
+        0,
+        12.8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        3.0,
+        0.75,
+        1.2
+      ],
+      "material_id": "m_white",
+      "zone_id": "z_consult",
+      "label": "Consultation & demo meeting table"
+    },
+    {
+      "id": "meeting_chair_1",
+      "type": "chair",
+      "position": [
+        3.5,
+        0,
+        11.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.45,
+        0.9,
+        0.45
+      ],
+      "material_id": "m_navy",
+      "zone_id": "z_consult"
+    },
+    {
+      "id": "meeting_chair_2",
+      "type": "chair",
+      "position": [
+        4.5,
+        0,
+        11.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.45,
+        0.9,
+        0.45
+      ],
+      "material_id": "m_navy",
+      "zone_id": "z_consult"
+    },
+    {
+      "id": "meeting_chair_3",
+      "type": "chair",
+      "position": [
+        5.5,
+        0,
+        11.7
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.45,
+        0.9,
+        0.45
+      ],
+      "material_id": "m_navy",
+      "zone_id": "z_consult"
+    },
+    {
+      "id": "meeting_chair_4",
+      "type": "chair",
+      "position": [
+        3.5,
+        0,
+        13.9
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.45,
+        0.9,
+        0.45
+      ],
+      "material_id": "m_navy",
+      "zone_id": "z_consult"
+    },
+    {
+      "id": "meeting_chair_5",
+      "type": "chair",
+      "position": [
+        4.5,
+        0,
+        13.9
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.45,
+        0.9,
+        0.45
+      ],
+      "material_id": "m_navy",
+      "zone_id": "z_consult"
+    },
+    {
+      "id": "meeting_chair_6",
+      "type": "chair",
+      "position": [
+        5.5,
+        0,
+        13.9
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.45,
+        0.9,
+        0.45
+      ],
+      "material_id": "m_navy",
+      "zone_id": "z_consult"
+    },
+    {
+      "id": "consult_cta_screen",
+      "type": "wall_screen",
+      "position": [
+        0.25,
+        1.2,
+        12.8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.1,
+        1.2,
+        2.4
+      ],
+      "material_id": "m_orange",
+      "zone_id": "z_consult",
+      "label": "Book a consultation / start an application"
+    },
+    {
+      "id": "support_phone_sign",
+      "type": "wall_sign",
+      "position": [
+        7.5,
+        1.8,
+        14.85
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.6,
+        0.4,
+        0.05
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_consult",
+      "label": "Customer support: 0993 291 3471"
+    },
+    {
+      "id": "ops_dashboard_wall",
+      "type": "dashboard_wall",
+      "position": [
+        14.8,
+        1.0,
+        14.85
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        6.0,
+        1.8,
+        0.1
+      ],
+      "material_id": "m_navy",
+      "zone_id": "z_ops",
+      "label": "Operations dashboard – placeholder with sample data only; not live"
+    },
+    {
+      "id": "automation_flow_visual",
+      "type": "display_stand",
+      "position": [
+        14.5,
+        0,
+        12.4
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.6,
+        1.8,
+        0.2
+      ],
+      "material_id": "m_navy",
+      "zone_id": "z_ops",
+      "label": "Automation flow visual (concept; integrations not asserted)"
+    },
+    {
+      "id": "grm_gia_desk",
+      "type": "bot_desk",
+      "position": [
+        3.8,
+        0,
+        2.8
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        1.6,
+        0.75,
+        0.8
+      ],
+      "material_id": "m_white",
+      "zone_id": "z_reception",
+      "label": "GRM GIA station"
+    },
+    {
+      "id": "grm_gia_pedestal",
+      "type": "avatar_pedestal",
+      "position": [
+        3.8,
+        0,
+        3.6
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.15,
+        0.6
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_reception"
+    },
+    {
+      "id": "grm_gia_avatar",
+      "type": "avatar_humanoid",
+      "position": [
+        3.8,
+        0.15,
+        3.6
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.5,
+        1.75,
+        0.4
+      ],
+      "material_id": "m_navy",
+      "asset_url": "placeholder://avatars/grm_gia.glb",
+      "zone_id": "z_reception",
+      "label": "GRM GIA – AI Receptionist (navy uniform, orange accents)"
+    },
+    {
+      "id": "grm_gia_nameplate",
+      "type": "nameplate",
+      "position": [
+        3.8,
+        0.75,
+        2.5
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.1,
+        0.03
+      ],
+      "material_id": "m_orange",
+      "zone_id": "z_reception",
+      "label": "GRM GIA · AI Receptionist"
+    },
+    {
+      "id": "grm_gia_dashboard",
+      "type": "dashboard_screen",
+      "position": [
+        3.5,
+        0.75,
+        3.1
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.8,
+        0.5,
+        0.05
+      ],
+      "material_id": "m_navy",
+      "zone_id": "z_reception",
+      "label": "GRM GIA dashboard – ACTIVE; sample non-personal data"
+    },
+    {
+      "id": "grm_gia_cue",
+      "type": "cue_prop",
+      "position": [
+        4.35,
+        0.75,
+        2.8
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.3,
+        0.3,
+        0.3
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_reception",
+      "label": "plan_brochure_stand"
+    },
+    {
+      "id": "grm_ace_desk",
+      "type": "bot_desk",
+      "position": [
+        2.4,
+        0,
+        6.1
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.6,
+        0.75,
+        0.8
+      ],
+      "material_id": "m_white",
+      "zone_id": "z_demo_left",
+      "label": "GRM ACE station"
+    },
+    {
+      "id": "grm_ace_pedestal",
+      "type": "avatar_pedestal",
+      "position": [
+        2.4,
+        0,
+        5.3
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.15,
+        0.6
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_demo_left"
+    },
+    {
+      "id": "grm_ace_avatar",
+      "type": "avatar_humanoid",
+      "position": [
+        2.4,
+        0.15,
+        5.3
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.5,
+        1.75,
+        0.4
+      ],
+      "material_id": "m_navy",
+      "asset_url": "placeholder://avatars/grm_ace.glb",
+      "zone_id": "z_demo_left",
+      "label": "GRM ACE – AI Sales Consultant (navy uniform, orange accents)"
+    },
+    {
+      "id": "grm_ace_nameplate",
+      "type": "nameplate",
+      "position": [
+        2.4,
+        0.75,
+        6.4
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.1,
+        0.03
+      ],
+      "material_id": "m_orange",
+      "zone_id": "z_demo_left",
+      "label": "GRM ACE · AI Sales Consultant"
+    },
+    {
+      "id": "grm_ace_dashboard",
+      "type": "dashboard_screen",
+      "position": [
+        2.1,
+        0.75,
+        5.8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.8,
+        0.5,
+        0.05
+      ],
+      "material_id": "m_navy",
+      "zone_id": "z_demo_left",
+      "label": "GRM ACE dashboard – ACTIVE; sample non-personal data"
+    },
+    {
+      "id": "grm_ace_cue",
+      "type": "cue_prop",
+      "position": [
+        2.95,
+        0.75,
+        6.1
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.3,
+        0.3,
+        0.3
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_demo_left",
+      "label": "lead_pipeline_monitor"
+    },
+    {
+      "id": "grm_maya_desk",
+      "type": "bot_desk",
+      "position": [
+        16.4,
+        0,
+        2.4
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        1.6,
+        0.75,
+        0.8
+      ],
+      "material_id": "m_white",
+      "zone_id": "z_gallery",
+      "label": "GRM MAYA station"
+    },
+    {
+      "id": "grm_maya_pedestal",
+      "type": "avatar_pedestal",
+      "position": [
+        16.4,
+        0,
+        3.2
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.15,
+        0.6
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_gallery"
+    },
+    {
+      "id": "grm_maya_avatar",
+      "type": "avatar_humanoid",
+      "position": [
+        16.4,
+        0.15,
+        3.2
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.5,
+        1.75,
+        0.4
+      ],
+      "material_id": "m_navy",
+      "asset_url": "placeholder://avatars/grm_maya.glb",
+      "zone_id": "z_gallery",
+      "label": "GRM MAYA – AI Social Media Manager (navy uniform, orange accents)"
+    },
+    {
+      "id": "grm_maya_nameplate",
+      "type": "nameplate",
+      "position": [
+        16.4,
+        0.75,
+        2.1
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.1,
+        0.03
+      ],
+      "material_id": "m_orange",
+      "zone_id": "z_gallery",
+      "label": "GRM MAYA · AI Social Media Manager"
+    },
+    {
+      "id": "grm_maya_dashboard",
+      "type": "dashboard_screen",
+      "position": [
+        16.1,
+        0.75,
+        2.7
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.8,
+        0.5,
+        0.05
+      ],
+      "material_id": "m_navy",
+      "zone_id": "z_gallery",
+      "label": "GRM MAYA dashboard – PLANNED – demonstration only; sample non-personal data"
+    },
+    {
+      "id": "grm_maya_cue",
+      "type": "cue_prop",
+      "position": [
+        16.95,
+        0.75,
+        2.4
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.3,
+        0.3,
+        0.3
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_gallery",
+      "label": "content_calendar_board"
+    },
+    {
+      "id": "grm_finn_desk",
+      "type": "bot_desk",
+      "position": [
+        5.2,
+        0,
+        6.1
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.6,
+        0.75,
+        0.8
+      ],
+      "material_id": "m_white",
+      "zone_id": "z_demo_left",
+      "label": "GRM FINN station"
+    },
+    {
+      "id": "grm_finn_pedestal",
+      "type": "avatar_pedestal",
+      "position": [
+        5.2,
+        0,
+        5.3
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.15,
+        0.6
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_demo_left"
+    },
+    {
+      "id": "grm_finn_avatar",
+      "type": "avatar_humanoid",
+      "position": [
+        5.2,
+        0.15,
+        5.3
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.5,
+        1.75,
+        0.4
+      ],
+      "material_id": "m_navy",
+      "asset_url": "placeholder://avatars/grm_finn.glb",
+      "zone_id": "z_demo_left",
+      "label": "GRM FINN – AI Finance Officer (navy uniform, orange accents)"
+    },
+    {
+      "id": "grm_finn_nameplate",
+      "type": "nameplate",
+      "position": [
+        5.2,
+        0.75,
+        6.4
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.1,
+        0.03
+      ],
+      "material_id": "m_orange",
+      "zone_id": "z_demo_left",
+      "label": "GRM FINN · AI Finance Officer"
+    },
+    {
+      "id": "grm_finn_dashboard",
+      "type": "dashboard_screen",
+      "position": [
+        4.9,
+        0.75,
+        5.8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.8,
+        0.5,
+        0.05
+      ],
+      "material_id": "m_navy",
+      "zone_id": "z_demo_left",
+      "label": "GRM FINN dashboard – ACTIVE; sign-in required for live data"
+    },
+    {
+      "id": "grm_finn_cue",
+      "type": "cue_prop",
+      "position": [
+        5.75,
+        0.75,
+        6.1
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.3,
+        0.3,
+        0.3
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_demo_left",
+      "label": "soa_document_tray"
+    },
+    {
+      "id": "grm_hana_desk",
+      "type": "bot_desk",
+      "position": [
+        2.4,
+        0,
+        9.2
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        1.6,
+        0.75,
+        0.8
+      ],
+      "material_id": "m_white",
+      "zone_id": "z_demo_left",
+      "label": "GRM HANA station"
+    },
+    {
+      "id": "grm_hana_pedestal",
+      "type": "avatar_pedestal",
+      "position": [
+        2.4,
+        0,
+        10.0
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.15,
+        0.6
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_demo_left"
+    },
+    {
+      "id": "grm_hana_avatar",
+      "type": "avatar_humanoid",
+      "position": [
+        2.4,
+        0.15,
+        10.0
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.5,
+        1.75,
+        0.4
+      ],
+      "material_id": "m_navy",
+      "asset_url": "placeholder://avatars/grm_hana.glb",
+      "zone_id": "z_demo_left",
+      "label": "GRM HANA – AI HR Officer (navy uniform, orange accents)"
+    },
+    {
+      "id": "grm_hana_nameplate",
+      "type": "nameplate",
+      "position": [
+        2.4,
+        0.75,
+        8.9
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.1,
+        0.03
+      ],
+      "material_id": "m_orange",
+      "zone_id": "z_demo_left",
+      "label": "GRM HANA · AI HR Officer"
+    },
+    {
+      "id": "grm_hana_dashboard",
+      "type": "dashboard_screen",
+      "position": [
+        2.1,
+        0.75,
+        9.5
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.8,
+        0.5,
+        0.05
+      ],
+      "material_id": "m_navy",
+      "zone_id": "z_demo_left",
+      "label": "GRM HANA dashboard – PLANNED – demonstration only; sign-in required for live data"
+    },
+    {
+      "id": "grm_hana_cue",
+      "type": "cue_prop",
+      "position": [
+        2.95,
+        0.75,
+        9.2
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.3,
+        0.3,
+        0.3
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_demo_left",
+      "label": "sop_binder"
+    },
+    {
+      "id": "grm_neo_desk",
+      "type": "bot_desk",
+      "position": [
+        15.2,
+        0,
+        6.1
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.6,
+        0.75,
+        0.8
+      ],
+      "material_id": "m_white",
+      "zone_id": "z_demo_right",
+      "label": "GRM NEO station"
+    },
+    {
+      "id": "grm_neo_pedestal",
+      "type": "avatar_pedestal",
+      "position": [
+        15.2,
+        0,
+        5.3
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.15,
+        0.6
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_demo_right"
+    },
+    {
+      "id": "grm_neo_avatar",
+      "type": "avatar_humanoid",
+      "position": [
+        15.2,
+        0.15,
+        5.3
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.5,
+        1.75,
+        0.4
+      ],
+      "material_id": "m_navy",
+      "asset_url": "placeholder://avatars/grm_neo.glb",
+      "zone_id": "z_demo_right",
+      "label": "GRM NEO – AI Network Engineer (navy uniform, orange accents)"
+    },
+    {
+      "id": "grm_neo_nameplate",
+      "type": "nameplate",
+      "position": [
+        15.2,
+        0.75,
+        6.4
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.1,
+        0.03
+      ],
+      "material_id": "m_orange",
+      "zone_id": "z_demo_right",
+      "label": "GRM NEO · AI Network Engineer"
+    },
+    {
+      "id": "grm_neo_dashboard",
+      "type": "dashboard_screen",
+      "position": [
+        14.9,
+        0.75,
+        5.8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.8,
+        0.5,
+        0.05
+      ],
+      "material_id": "m_navy",
+      "zone_id": "z_demo_right",
+      "label": "GRM NEO dashboard – PLANNED – demonstration only; sign-in required for live data"
+    },
+    {
+      "id": "grm_neo_cue",
+      "type": "cue_prop",
+      "position": [
+        15.75,
+        0.75,
+        6.1
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.3,
+        0.3,
+        0.3
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_demo_right",
+      "label": "olt_rack_model"
+    },
+    {
+      "id": "grm_tess_desk",
+      "type": "bot_desk",
+      "position": [
+        12.2,
+        0,
+        6.1
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.6,
+        0.75,
+        0.8
+      ],
+      "material_id": "m_white",
+      "zone_id": "z_demo_right",
+      "label": "GRM TESS station"
+    },
+    {
+      "id": "grm_tess_pedestal",
+      "type": "avatar_pedestal",
+      "position": [
+        12.2,
+        0,
+        5.3
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.15,
+        0.6
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_demo_right"
+    },
+    {
+      "id": "grm_tess_avatar",
+      "type": "avatar_humanoid",
+      "position": [
+        12.2,
+        0.15,
+        5.3
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.5,
+        1.75,
+        0.4
+      ],
+      "material_id": "m_navy",
+      "asset_url": "placeholder://avatars/grm_tess.glb",
+      "zone_id": "z_demo_right",
+      "label": "GRM TESS – AI Technical Support (navy uniform, orange accents)"
+    },
+    {
+      "id": "grm_tess_nameplate",
+      "type": "nameplate",
+      "position": [
+        12.2,
+        0.75,
+        6.4
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.1,
+        0.03
+      ],
+      "material_id": "m_orange",
+      "zone_id": "z_demo_right",
+      "label": "GRM TESS · AI Technical Support"
+    },
+    {
+      "id": "grm_tess_dashboard",
+      "type": "dashboard_screen",
+      "position": [
+        11.9,
+        0.75,
+        5.8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.8,
+        0.5,
+        0.05
+      ],
+      "material_id": "m_navy",
+      "zone_id": "z_demo_right",
+      "label": "GRM TESS dashboard – ACTIVE; sample non-personal data"
+    },
+    {
+      "id": "grm_tess_cue",
+      "type": "cue_prop",
+      "position": [
+        12.75,
+        0.75,
+        6.1
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.3,
+        0.3,
+        0.3
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_demo_right",
+      "label": "ont_los_demo_unit"
+    },
+    {
+      "id": "grm_max_desk",
+      "type": "bot_desk",
+      "position": [
+        12.2,
+        0,
+        9.2
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        1.6,
+        0.75,
+        0.8
+      ],
+      "material_id": "m_white",
+      "zone_id": "z_demo_right",
+      "label": "GRM MAX station"
+    },
+    {
+      "id": "grm_max_pedestal",
+      "type": "avatar_pedestal",
+      "position": [
+        12.2,
+        0,
+        10.0
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.15,
+        0.6
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_demo_right"
+    },
+    {
+      "id": "grm_max_avatar",
+      "type": "avatar_humanoid",
+      "position": [
+        12.2,
+        0.15,
+        10.0
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.5,
+        1.75,
+        0.4
+      ],
+      "material_id": "m_navy",
+      "asset_url": "placeholder://avatars/grm_max.glb",
+      "zone_id": "z_demo_right",
+      "label": "GRM MAX – AI Field Operations Coordinator (navy uniform, orange accents)"
+    },
+    {
+      "id": "grm_max_nameplate",
+      "type": "nameplate",
+      "position": [
+        12.2,
+        0.75,
+        8.9
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.1,
+        0.03
+      ],
+      "material_id": "m_orange",
+      "zone_id": "z_demo_right",
+      "label": "GRM MAX · AI Field Operations Coordinator"
+    },
+    {
+      "id": "grm_max_dashboard",
+      "type": "dashboard_screen",
+      "position": [
+        11.9,
+        0.75,
+        9.5
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.8,
+        0.5,
+        0.05
+      ],
+      "material_id": "m_navy",
+      "zone_id": "z_demo_right",
+      "label": "GRM MAX dashboard – PLANNED – demonstration only; sample non-personal data"
+    },
+    {
+      "id": "grm_max_cue",
+      "type": "cue_prop",
+      "position": [
+        12.75,
+        0.75,
+        9.2
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.3,
+        0.3,
+        0.3
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_demo_right",
+      "label": "work_order_board"
+    },
+    {
+      "id": "grm_cleo_desk",
+      "type": "bot_desk",
+      "position": [
+        8.0,
+        0,
+        6.1
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        1.6,
+        0.75,
+        0.8
+      ],
+      "material_id": "m_white",
+      "zone_id": "z_demo_left",
+      "label": "GRM CLEO station"
+    },
+    {
+      "id": "grm_cleo_pedestal",
+      "type": "avatar_pedestal",
+      "position": [
+        8.0,
+        0,
+        5.3
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.15,
+        0.6
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_demo_left"
+    },
+    {
+      "id": "grm_cleo_avatar",
+      "type": "avatar_humanoid",
+      "position": [
+        8.0,
+        0.15,
+        5.3
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.5,
+        1.75,
+        0.4
+      ],
+      "material_id": "m_navy",
+      "asset_url": "placeholder://avatars/grm_cleo.glb",
+      "zone_id": "z_demo_left",
+      "label": "GRM CLEO – AI Collection Officer (navy uniform, orange accents)"
+    },
+    {
+      "id": "grm_cleo_nameplate",
+      "type": "nameplate",
+      "position": [
+        8.0,
+        0.75,
+        6.4
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.1,
+        0.03
+      ],
+      "material_id": "m_orange",
+      "zone_id": "z_demo_left",
+      "label": "GRM CLEO · AI Collection Officer"
+    },
+    {
+      "id": "grm_cleo_dashboard",
+      "type": "dashboard_screen",
+      "position": [
+        7.7,
+        0.75,
+        5.8
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.8,
+        0.5,
+        0.05
+      ],
+      "material_id": "m_navy",
+      "zone_id": "z_demo_left",
+      "label": "GRM CLEO dashboard – PLANNED – demonstration only; sign-in required for live data"
+    },
+    {
+      "id": "grm_cleo_cue",
+      "type": "cue_prop",
+      "position": [
+        8.55,
+        0.75,
+        6.1
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.3,
+        0.3,
+        0.3
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_demo_left",
+      "label": "overdue_tracker_tablet"
+    },
+    {
+      "id": "grm_ivy_desk",
+      "type": "bot_desk",
+      "position": [
+        15.2,
+        0,
+        9.2
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        1.6,
+        0.75,
+        0.8
+      ],
+      "material_id": "m_white",
+      "zone_id": "z_demo_right",
+      "label": "GRM IVY station"
+    },
+    {
+      "id": "grm_ivy_pedestal",
+      "type": "avatar_pedestal",
+      "position": [
+        15.2,
+        0,
+        10.0
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.15,
+        0.6
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_demo_right"
+    },
+    {
+      "id": "grm_ivy_avatar",
+      "type": "avatar_humanoid",
+      "position": [
+        15.2,
+        0.15,
+        10.0
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.5,
+        1.75,
+        0.4
+      ],
+      "material_id": "m_navy",
+      "asset_url": "placeholder://avatars/grm_ivy.glb",
+      "zone_id": "z_demo_right",
+      "label": "GRM IVY – AI Inventory & Procurement Officer (navy uniform, orange accents)"
+    },
+    {
+      "id": "grm_ivy_nameplate",
+      "type": "nameplate",
+      "position": [
+        15.2,
+        0.75,
+        8.9
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.1,
+        0.03
+      ],
+      "material_id": "m_orange",
+      "zone_id": "z_demo_right",
+      "label": "GRM IVY · AI Inventory & Procurement Officer"
+    },
+    {
+      "id": "grm_ivy_dashboard",
+      "type": "dashboard_screen",
+      "position": [
+        14.9,
+        0.75,
+        9.5
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.8,
+        0.5,
+        0.05
+      ],
+      "material_id": "m_navy",
+      "zone_id": "z_demo_right",
+      "label": "GRM IVY dashboard – PLANNED – demonstration only; sample non-personal data"
+    },
+    {
+      "id": "grm_ivy_cue",
+      "type": "cue_prop",
+      "position": [
+        15.75,
+        0.75,
+        9.2
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.3,
+        0.3,
+        0.3
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_demo_right",
+      "label": "ont_router_stock_shelf"
+    },
+    {
+      "id": "grm_lex_desk",
+      "type": "bot_desk",
+      "position": [
+        5.2,
+        0,
+        9.2
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        1.6,
+        0.75,
+        0.8
+      ],
+      "material_id": "m_white",
+      "zone_id": "z_demo_left",
+      "label": "GRM LEX station"
+    },
+    {
+      "id": "grm_lex_pedestal",
+      "type": "avatar_pedestal",
+      "position": [
+        5.2,
+        0,
+        10.0
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.15,
+        0.6
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_demo_left"
+    },
+    {
+      "id": "grm_lex_avatar",
+      "type": "avatar_humanoid",
+      "position": [
+        5.2,
+        0.15,
+        10.0
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.5,
+        1.75,
+        0.4
+      ],
+      "material_id": "m_navy",
+      "asset_url": "placeholder://avatars/grm_lex.glb",
+      "zone_id": "z_demo_left",
+      "label": "GRM LEX – AI Documents & Compliance Officer (navy uniform, orange accents)"
+    },
+    {
+      "id": "grm_lex_nameplate",
+      "type": "nameplate",
+      "position": [
+        5.2,
+        0.75,
+        8.9
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.1,
+        0.03
+      ],
+      "material_id": "m_orange",
+      "zone_id": "z_demo_left",
+      "label": "GRM LEX · AI Documents & Compliance Officer"
+    },
+    {
+      "id": "grm_lex_dashboard",
+      "type": "dashboard_screen",
+      "position": [
+        4.9,
+        0.75,
+        9.5
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.8,
+        0.5,
+        0.05
+      ],
+      "material_id": "m_navy",
+      "zone_id": "z_demo_left",
+      "label": "GRM LEX dashboard – PLANNED – demonstration only; sign-in required for live data"
+    },
+    {
+      "id": "grm_lex_cue",
+      "type": "cue_prop",
+      "position": [
+        5.75,
+        0.75,
+        9.2
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.3,
+        0.3,
+        0.3
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_demo_left",
+      "label": "document_cabinet_model"
+    },
+    {
+      "id": "grm_dex_desk",
+      "type": "bot_desk",
+      "position": [
+        16.8,
+        0,
+        12.4
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        1.6,
+        0.75,
+        0.8
+      ],
+      "material_id": "m_white",
+      "zone_id": "z_ops",
+      "label": "GRM DEX station"
+    },
+    {
+      "id": "grm_dex_pedestal",
+      "type": "avatar_pedestal",
+      "position": [
+        16.8,
+        0,
+        13.2
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.15,
+        0.6
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_ops"
+    },
+    {
+      "id": "grm_dex_avatar",
+      "type": "avatar_humanoid",
+      "position": [
+        16.8,
+        0.15,
+        13.2
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.5,
+        1.75,
+        0.4
+      ],
+      "material_id": "m_navy",
+      "asset_url": "placeholder://avatars/grm_dex.glb",
+      "zone_id": "z_ops",
+      "label": "GRM DEX – AI Business Intelligence Analyst (navy uniform, orange accents)"
+    },
+    {
+      "id": "grm_dex_nameplate",
+      "type": "nameplate",
+      "position": [
+        16.8,
+        0.75,
+        12.1
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.1,
+        0.03
+      ],
+      "material_id": "m_orange",
+      "zone_id": "z_ops",
+      "label": "GRM DEX · AI Business Intelligence Analyst"
+    },
+    {
+      "id": "grm_dex_dashboard",
+      "type": "dashboard_screen",
+      "position": [
+        16.5,
+        0.75,
+        12.7
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.8,
+        0.5,
+        0.05
+      ],
+      "material_id": "m_navy",
+      "zone_id": "z_ops",
+      "label": "GRM DEX dashboard – PLANNED – demonstration only; sign-in required for live data"
+    },
+    {
+      "id": "grm_dex_cue",
+      "type": "cue_prop",
+      "position": [
+        17.35,
+        0.75,
+        12.4
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.3,
+        0.3,
+        0.3
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_ops",
+      "label": "kpi_chart_tablet"
+    },
+    {
+      "id": "grm_omar_desk",
+      "type": "bot_desk",
+      "position": [
+        12.2,
+        0,
+        12.4
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        1.6,
+        0.75,
+        0.8
+      ],
+      "material_id": "m_white",
+      "zone_id": "z_ops",
+      "label": "GRM OMAR station"
+    },
+    {
+      "id": "grm_omar_pedestal",
+      "type": "avatar_pedestal",
+      "position": [
+        12.2,
+        0,
+        13.2
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.15,
+        0.6
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_ops"
+    },
+    {
+      "id": "grm_omar_avatar",
+      "type": "avatar_humanoid",
+      "position": [
+        12.2,
+        0.15,
+        13.2
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.5,
+        1.75,
+        0.4
+      ],
+      "material_id": "m_navy",
+      "asset_url": "placeholder://avatars/grm_omar.glb",
+      "zone_id": "z_ops",
+      "label": "GRM OMAR – AI Operations Manager (navy uniform, orange accents)"
+    },
+    {
+      "id": "grm_omar_nameplate",
+      "type": "nameplate",
+      "position": [
+        12.2,
+        0.75,
+        12.1
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.6,
+        0.1,
+        0.03
+      ],
+      "material_id": "m_orange",
+      "zone_id": "z_ops",
+      "label": "GRM OMAR · AI Operations Manager"
+    },
+    {
+      "id": "grm_omar_dashboard",
+      "type": "dashboard_screen",
+      "position": [
+        11.9,
+        0.75,
+        12.7
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.8,
+        0.5,
+        0.05
+      ],
+      "material_id": "m_navy",
+      "zone_id": "z_ops",
+      "label": "GRM OMAR dashboard – ACTIVE; sign-in required for live data"
+    },
+    {
+      "id": "grm_omar_cue",
+      "type": "cue_prop",
+      "position": [
+        12.75,
+        0.75,
+        12.4
+      ],
+      "rotation": [
+        0,
+        3.1416,
+        0
+      ],
+      "scale": [
+        0.3,
+        0.3,
+        0.3
+      ],
+      "material_id": "m_sky",
+      "zone_id": "z_ops",
+      "label": "escalation_queue_tablet"
+    }
+  ],
+  "materials": [
+    {
+      "id": "m_navy",
+      "base_color": "#242A3B",
+      "roughness": 0.5,
+      "metalness": 0.1
+    },
+    {
+      "id": "m_sky",
+      "base_color": "#78C2F0",
+      "roughness": 0.4,
+      "metalness": 0.0
+    },
+    {
+      "id": "m_orange",
+      "base_color": "#F79428",
+      "roughness": 0.45,
+      "metalness": 0.0
+    },
+    {
+      "id": "m_white",
+      "base_color": "#FFFFFF",
+      "roughness": 0.6,
+      "metalness": 0.0
+    },
+    {
+      "id": "m_wall",
+      "base_color": "#F4F6F9",
+      "roughness": 0.8,
+      "metalness": 0.0
+    },
+    {
+      "id": "m_floor",
+      "base_color": "#DDE3EA",
+      "roughness": 0.35,
+      "metalness": 0.05
+    }
+  ],
+  "lighting": [
+    {
+      "type": "ambient",
+      "position": [
+        10,
+        3,
+        7.5
+      ],
+      "intensity": 0.5,
+      "color": "#FFFFFF"
+    },
+    {
+      "type": "directional",
+      "position": [
+        10,
+        3.0,
+        7.5
+      ],
+      "intensity": 0.6,
+      "color": "#FFF4E5"
+    },
+    {
+      "type": "area",
+      "position": [
+        4.0,
+        3.1,
+        2.4
+      ],
+      "intensity": 0.8,
+      "color": "#EAF4FF"
+    },
+    {
+      "type": "area",
+      "position": [
+        13.3,
+        3.1,
+        2.4
+      ],
+      "intensity": 0.8,
+      "color": "#EAF4FF"
+    },
+    {
+      "type": "area",
+      "position": [
+        5.2,
+        3.1,
+        7.65
+      ],
+      "intensity": 0.8,
+      "color": "#EAF4FF"
+    },
+    {
+      "type": "area",
+      "position": [
+        14.8,
+        3.1,
+        7.65
+      ],
+      "intensity": 0.8,
+      "color": "#EAF4FF"
+    },
+    {
+      "type": "area",
+      "position": [
+        5.2,
+        3.1,
+        12.82
+      ],
+      "intensity": 0.8,
+      "color": "#EAF4FF"
+    },
+    {
+      "type": "area",
+      "position": [
+        14.8,
+        3.1,
+        12.82
+      ],
+      "intensity": 0.8,
+      "color": "#EAF4FF"
+    },
+    {
+      "type": "spot",
+      "position": [
+        1.5,
+        2.9,
+        2.4
+      ],
+      "intensity": 1.0,
+      "color": "#FFE2BF"
+    },
+    {
+      "type": "spot",
+      "position": [
+        10,
+        2.9,
+        3.6
+      ],
+      "intensity": 0.8,
+      "color": "#FFE2BF"
+    },
+    {
+      "type": "spot",
+      "position": [
+        14.8,
+        2.9,
+        13.8
+      ],
+      "intensity": 0.7,
+      "color": "#FFE2BF"
+    }
+  ],
+  "cameras": [
+    {
+      "id": "cam_overview",
+      "position": [
+        10,
+        15,
+        -9
+      ],
+      "target": [
+        10,
+        0,
+        7.5
+      ],
+      "fov": 45
+    },
+    {
+      "id": "cam_entry",
+      "position": [
+        10,
+        1.6,
+        0.6
+      ],
+      "target": [
+        10,
+        1.6,
+        8
+      ],
+      "fov": 65
+    },
+    {
+      "id": "cam_reception",
+      "position": [
+        6.5,
+        1.6,
+        0.9
+      ],
+      "target": [
+        3.8,
+        1.4,
+        3.2
+      ],
+      "fov": 60
+    },
+    {
+      "id": "cam_gallery",
+      "position": [
+        10.8,
+        1.6,
+        1.0
+      ],
+      "target": [
+        15.5,
+        1.4,
+        2.8
+      ],
+      "fov": 60
+    },
+    {
+      "id": "cam_wing_a",
+      "position": [
+        9.0,
+        1.6,
+        7.65
+      ],
+      "target": [
+        3.8,
+        1.2,
+        7.65
+      ],
+      "fov": 65
+    },
+    {
+      "id": "cam_wing_b",
+      "position": [
+        10.9,
+        1.6,
+        7.65
+      ],
+      "target": [
+        16.5,
+        1.2,
+        7.65
+      ],
+      "fov": 65
+    },
+    {
+      "id": "cam_ops",
+      "position": [
+        10.8,
+        1.6,
+        11.7
+      ],
+      "target": [
+        15.5,
+        1.4,
+        13.8
+      ],
+      "fov": 60
+    },
+    {
+      "id": "cam_consult",
+      "position": [
+        9.0,
+        1.6,
+        11.7
+      ],
+      "target": [
+        4.5,
+        1.0,
+        13.0
+      ],
+      "fov": 60
+    }
+  ],
+  "hotspots": [
+    {
+      "id": "hs_grm_gia",
+      "label": "Talk to GRM GIA",
+      "position": [
+        3.8,
+        2.1,
+        3.5999999999999996
+      ],
+      "action_type": "open_bot_chat",
+      "action_target": "open_bot_chat:grm_gia",
+      "bot_id": "grm_gia"
+    },
+    {
+      "id": "hs_grm_ace",
+      "label": "Talk to GRM ACE",
+      "position": [
+        2.4,
+        2.1,
+        5.3
+      ],
+      "action_type": "open_bot_chat",
+      "action_target": "open_bot_chat:grm_ace",
+      "bot_id": "grm_ace"
+    },
+    {
+      "id": "hs_grm_maya",
+      "label": "GRM MAYA – planned (demonstration preview, not connected)",
+      "position": [
+        16.4,
+        2.1,
+        3.2
+      ],
+      "action_type": "open_info_panel",
+      "action_target": "open_info_panel:grm_maya_planned_preview",
+      "bot_id": "grm_maya"
+    },
+    {
+      "id": "hs_grm_finn",
+      "label": "Talk to GRM FINN",
+      "position": [
+        5.2,
+        2.1,
+        5.3
+      ],
+      "action_type": "open_bot_chat",
+      "action_target": "open_bot_chat:grm_finn",
+      "bot_id": "grm_finn"
+    },
+    {
+      "id": "hs_grm_hana",
+      "label": "GRM HANA – planned (demonstration preview, not connected)",
+      "position": [
+        2.4,
+        2.1,
+        10.0
+      ],
+      "action_type": "open_info_panel",
+      "action_target": "open_info_panel:grm_hana_planned_preview",
+      "bot_id": "grm_hana"
+    },
+    {
+      "id": "hs_grm_neo",
+      "label": "GRM NEO – planned (demonstration preview, not connected)",
+      "position": [
+        15.2,
+        2.1,
+        5.3
+      ],
+      "action_type": "open_info_panel",
+      "action_target": "open_info_panel:grm_neo_planned_preview",
+      "bot_id": "grm_neo"
+    },
+    {
+      "id": "hs_grm_tess",
+      "label": "Talk to GRM TESS",
+      "position": [
+        12.2,
+        2.1,
+        5.3
+      ],
+      "action_type": "open_bot_chat",
+      "action_target": "open_bot_chat:grm_tess",
+      "bot_id": "grm_tess"
+    },
+    {
+      "id": "hs_grm_max",
+      "label": "GRM MAX – planned (demonstration preview, not connected)",
+      "position": [
+        12.2,
+        2.1,
+        10.0
+      ],
+      "action_type": "open_info_panel",
+      "action_target": "open_info_panel:grm_max_planned_preview",
+      "bot_id": "grm_max"
+    },
+    {
+      "id": "hs_grm_cleo",
+      "label": "GRM CLEO – planned (demonstration preview, not connected)",
+      "position": [
+        8.0,
+        2.1,
+        5.3
+      ],
+      "action_type": "open_info_panel",
+      "action_target": "open_info_panel:grm_cleo_planned_preview",
+      "bot_id": "grm_cleo"
+    },
+    {
+      "id": "hs_grm_ivy",
+      "label": "GRM IVY – planned (demonstration preview, not connected)",
+      "position": [
+        15.2,
+        2.1,
+        10.0
+      ],
+      "action_type": "open_info_panel",
+      "action_target": "open_info_panel:grm_ivy_planned_preview",
+      "bot_id": "grm_ivy"
+    },
+    {
+      "id": "hs_grm_lex",
+      "label": "GRM LEX – planned (demonstration preview, not connected)",
+      "position": [
+        5.2,
+        2.1,
+        10.0
+      ],
+      "action_type": "open_info_panel",
+      "action_target": "open_info_panel:grm_lex_planned_preview",
+      "bot_id": "grm_lex"
+    },
+    {
+      "id": "hs_grm_dex",
+      "label": "GRM DEX – planned (demonstration preview, not connected)",
+      "position": [
+        16.8,
+        2.1,
+        13.200000000000001
+      ],
+      "action_type": "open_info_panel",
+      "action_target": "open_info_panel:grm_dex_planned_preview",
+      "bot_id": "grm_dex"
+    },
+    {
+      "id": "hs_grm_omar",
+      "label": "Talk to GRM OMAR",
+      "position": [
+        12.2,
+        2.1,
+        13.200000000000001
+      ],
+      "action_type": "open_bot_chat",
+      "action_target": "open_bot_chat:grm_omar",
+      "bot_id": "grm_omar"
+    },
+    {
+      "id": "hs_return_lobby",
+      "label": "Return to Lobby / Entrance",
+      "position": [
+        10,
+        2.1,
+        0.5
+      ],
+      "action_type": "navigate_zone",
+      "action_target": "z_reception"
+    },
+    {
+      "id": "hs_floor_directory",
+      "label": "Floor 3 directory",
+      "position": [
+        6.4,
+        1.6,
+        1.3
+      ],
+      "action_type": "open_info_panel",
+      "action_target": "open_info_panel:floor_directory"
+    },
+    {
+      "id": "hs_guided_tour",
+      "label": "Start guided tour",
+      "position": [
+        5.4,
+        1.2,
+        2.8
+      ],
+      "action_type": "play_demo",
+      "action_target": "play_demo:guided_tour"
+    },
+    {
+      "id": "hs_website",
+      "label": "Website (link pending)",
+      "position": [
+        12.2,
+        1.0,
+        0.5
+      ],
+      "action_type": "open_info_panel",
+      "action_target": "open_info_panel:website_link_pending"
+    },
+    {
+      "id": "hs_facebook",
+      "label": "Facebook page (link pending)",
+      "position": [
+        14.6,
+        1.0,
+        0.5
+      ],
+      "action_type": "open_info_panel",
+      "action_target": "open_info_panel:facebook_link_pending"
+    },
+    {
+      "id": "hs_ftth_explainer",
+      "label": "How FTTH works",
+      "position": [
+        12.8,
+        1.9,
+        2.6
+      ],
+      "action_type": "play_demo",
+      "action_target": "play_demo:ftth_explainer"
+    },
+    {
+      "id": "hs_plans",
+      "label": "Internet plans",
+      "position": [
+        19.4,
+        1.9,
+        2.4
+      ],
+      "action_type": "open_info_panel",
+      "action_target": "open_info_panel:internet_plans"
+    },
+    {
+      "id": "hs_book_consultation",
+      "label": "Book a consultation / start application with GRM ACE",
+      "position": [
+        0.6,
+        1.9,
+        12.8
+      ],
+      "action_type": "open_bot_chat",
+      "action_target": "open_bot_chat:grm_ace",
+      "bot_id": "grm_ace"
+    },
+    {
+      "id": "hs_support_phone",
+      "label": "Customer support: 0993 291 3471",
+      "position": [
+        7.5,
+        1.8,
+        14.6
+      ],
+      "action_type": "open_info_panel",
+      "action_target": "open_info_panel:support_phone"
+    },
+    {
+      "id": "hs_ops_dashboard",
+      "label": "Operations dashboard (sample data)",
+      "position": [
+        14.8,
+        1.6,
+        14.6
+      ],
+      "action_type": "open_info_panel",
+      "action_target": "open_info_panel:operations_dashboard_placeholder"
+    },
+    {
+      "id": "hs_scenario_wall",
+      "label": "Interactive scenario wall (demo only)",
+      "position": [
+        19.4,
+        1.6,
+        7.65
+      ],
+      "action_type": "play_demo",
+      "action_target": "play_demo:scenario_wall_samples"
+    }
+  ],
+  "visitor_route": [
+    "entry_portal",
+    "z_reception",
+    "z_gallery",
+    "z_demo_left",
+    "z_demo_right",
+    "z_ops",
+    "z_consult",
+    "return_portal_sign"
+  ],
+  "responsive": {
+    "desktop": "Free-roam 3D with WASD/arrow keys and mouse look, click or Enter on hotspots, guided-tour button, day/night toggle, floor selector and an always-visible Return to Lobby control; initial view cam_overview.",
+    "mobile": "2D clickable floor map with bot cards (active/planned badges), direct Talk-to-bot actions, plans and support-phone panels; no mandatory free-roam movement; optional tap-to-teleport between camera viewpoints.",
+    "reduced_motion": "Honor prefers-reduced-motion: disable idle avatar animation, camera fly-throughs and pulsing highlights; jump between viewpoints instantly; every hotspot reachable by keyboard tab order with visible focus and text labels."
+  }
+}
